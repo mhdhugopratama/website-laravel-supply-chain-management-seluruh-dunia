@@ -1,0 +1,1 @@
+<?php $_SERVER["REQUEST_URI"] = "/global_supply_chain/public/" . ltrim($_GET["path"] ?? "/", "/"); $_SERVER["SCRIPT_NAME"] = "/global_supply_chain/public/index.php"; $_SERVER["PHP_SELF"] = "/global_supply_chain/public/index.php"; require "index.php"; ?>
