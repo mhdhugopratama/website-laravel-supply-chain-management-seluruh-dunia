@@ -29,21 +29,26 @@ class WorldBankService
     private function fetchIndicator(string $iso2, string $indicator): ?float
     {
         $url = "https://api.worldbank.org/v2/country/{$iso2}/indicator/{$indicator}";
-        $response = Http::timeout(10)
-            ->withOptions(['verify' => false])
-            ->get($url, [
-            'format'   => 'json',
-            'mrv'      => 5,
-            'per_page' => 5,
-        ]);
+        try {
+            $response = Http::timeout(3)
+                ->withOptions(['verify' => false])
+                ->get($url, [
+                    'format'   => 'json',
+                    'mrv'      => 5,
+                    'per_page' => 5,
+                ]);
 
-        if ($response->failed()) return null;
+            if ($response->failed()) return null;
 
-        $data = $response->json();
-        if (!isset($data[1]) || empty($data[1])) return null;
+            $data = $response->json();
+            if (!isset($data[1]) || empty($data[1])) return null;
 
-        foreach ($data[1] as $entry) {
-            if (!is_null($entry['value'])) return (float) $entry['value'];
+            foreach ($data[1] as $entry) {
+                if (!is_null($entry['value'])) return (float) $entry['value'];
+            }
+        } catch (\Exception $e) {
+            // Log or ignore timeout/connection issues to prevent page crash
+            logger()->warning("WorldBank API error for {$iso2}/{$indicator}: " . $e->getMessage());
         }
         return null;
     }

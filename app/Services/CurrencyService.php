@@ -12,9 +12,14 @@ class CurrencyService
     public function getRates(): array
     {
         return Cache::remember('exchange_rates_usd', 3600, function () {
-            $response = Http::timeout(10)->withOptions(['verify' => false])->get($this->baseUrl);
-            if ($response->failed()) return [];
-            return $response->json('rates', []);
+            try {
+                $response = Http::timeout(3)->withOptions(['verify' => false])->get($this->baseUrl);
+                if ($response->failed()) return [];
+                return $response->json('rates', []);
+            } catch (\Exception $e) {
+                logger()->warning("ExchangeRate API error: " . $e->getMessage());
+                return [];
+            }
         });
     }
 
