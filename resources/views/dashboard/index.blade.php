@@ -77,7 +77,7 @@
                 <div class="icon-pill icon-pill-primary"><i class="bi bi-globe2"></i></div>
             </div>
             <div class="kpi-value" style="color:var(--primary)">{{ $countries->count() }}</div>
-            <div class="kpi-delta up"><i class="bi bi-arrow-up-right"></i> Tracked Globally</div>
+            <div class="kpi-delta up"><i class="bi bi-arrow-up-right"></i> {{ __('app.dashboard.track_globally') }}</div>
         </div>
     </div>
     <div class="col-6 col-lg-3">
@@ -87,17 +87,17 @@
                 <div class="icon-pill icon-pill-teal"><i class="bi bi-anchor"></i></div>
             </div>
             <div class="kpi-value" style="color:var(--teal)">{{ $ports->count() }}</div>
-            <div class="kpi-delta flat"><i class="bi bi-dash"></i> Sea Ports Mapped</div>
+            <div class="kpi-delta flat"><i class="bi bi-dash"></i> {{ __('app.dashboard.sea_ports_mapped') }}</div>
         </div>
     </div>
     <div class="col-6 col-lg-3">
         <div class="kpi-card">
             <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="kpi-label">Weather Stations</span>
+                <span class="kpi-label">{{ __('app.dashboard.weather_stations') }}</span>
                 <div class="icon-pill icon-pill-orange"><i class="bi bi-cloud-sun"></i></div>
             </div>
             <div class="kpi-value" style="color:var(--secondary)">{{ count($weatherCities) }}</div>
-            <div class="kpi-delta up"><i class="bi bi-circle-fill" style="font-size:0.4rem"></i> Live Readings</div>
+            <div class="kpi-delta up"><i class="bi bi-circle-fill" style="font-size:0.4rem"></i> {{ __('app.dashboard.live_readings') }}</div>
         </div>
     </div>
     <div class="col-6 col-lg-3">
@@ -107,7 +107,7 @@
                 <div class="icon-pill icon-pill-green"><i class="bi bi-activity"></i></div>
             </div>
             <div class="kpi-value" style="color:var(--green)">{{ __('app.dashboard.live') }}</div>
-            <div class="kpi-delta up"><i class="bi bi-circle-fill" style="font-size:0.4rem"></i> Real-time Feed</div>
+            <div class="kpi-delta up"><i class="bi bi-circle-fill" style="font-size:0.4rem"></i> {{ __('app.dashboard.realtime_feed') }}</div>
         </div>
     </div>
 </div>
@@ -115,21 +115,23 @@
 {{-- ── WORLD MAPS SECTION ────────────────────────────────────────────── --}}
 <div class="nb-card mb-4">
     <div class="nb-card-header">
-        <i class="bi bi-map-fill"></i> Global Intelligence Maps
-        <span class="ms-auto" style="font-size:0.68rem;text-transform:none;font-weight:500;color:var(--text-muted)">Data updated every 30 min · Click any marker for details</span>
+        <i class="bi bi-map-fill"></i> {{ __('app.dashboard.global_maps') }}
+        <span class="ms-auto" style="font-size:0.68rem;text-transform:none;font-weight:500;color:var(--text-muted)">{{ __('app.dashboard.data_updated') }} · {{ __('app.dashboard.click_marker') }}</span>
     </div>
     <div class="nb-card-body">
 
-        {{-- Tab buttons --}}
         <div class="map-tab-btns" id="mapTabBtns">
             <button class="map-tab-btn active" onclick="switchMap('risk',this)">
-                <i class="bi bi-exclamation-triangle-fill"></i> Supply Chain Risk
+                <i class="bi bi-exclamation-triangle-fill"></i> {{ __('app.dashboard.risk_map') }}
+            </button>
+            <button class="map-tab-btn" onclick="switchMap('route',this)">
+                <i class="bi bi-geo-alt-fill"></i> {{ __('app.dashboard.route_tracker') }}
             </button>
             <button class="map-tab-btn" onclick="switchMap('weather',this)">
-                <i class="bi bi-cloud-lightning-rain"></i> Live Weather
+                <i class="bi bi-cloud-lightning-rain"></i> {{ __('app.dashboard.live_weather_map') }}
             </button>
             <button class="map-tab-btn" onclick="switchMap('ports',this)">
-                <i class="bi bi-anchor"></i> Port Distribution
+                <i class="bi bi-anchor"></i> {{ __('app.dashboard.port_map') }}
             </button>
         </div>
 
@@ -140,7 +142,24 @@
                 <span><span class="legend-dot" style="background:#10b981"></span>Low Risk (0–30)</span>
                 <span><span class="legend-dot" style="background:#f59e0b"></span>Medium (31–60)</span>
                 <span><span class="legend-dot" style="background:#ef4444"></span>High Risk (61–100)</span>
-                <span class="ms-auto" style="color:var(--text-muted);font-weight:500">{{ count($mapCountries) }} countries plotted · based on weather risk index</span>
+                <span class="ms-auto" style="color:var(--text-muted);font-weight:500">{{ count($mapCountries) }} countries plotted · click any for full info</span>
+            </div>
+        </div>
+
+        {{-- Route Tracker Panel --}}
+        <div class="map-panel" id="panel-route">
+            <div class="d-flex gap-2 mb-2 p-2 align-items-center" style="background:var(--card-bg); border-radius:8px; border:1px solid var(--card-border);">
+                <div id="routeStatus" class="flex-grow-1 text-center fw-bold" style="font-size:0.85rem; color:var(--primary)">
+                    <i class="bi bi-hand-index-thumb"></i> <span id="routeStatusText">{{ __('app.dashboard.step1') }}</span>
+                </div>
+                <button onclick="resetRoute()" class="nb-btn nb-btn-outline" style="padding:4px 12px; font-size:0.75rem">
+                    <i class="bi bi-arrow-counterclockwise"></i> {{ __('app.dashboard.reset') }}
+                </button>
+            </div>
+            <div id="routeWorldMap" style="height: 320px; width: 100%; border-radius: 10px; z-index: 1;"></div>
+            <div class="map-legend mt-2">
+                <span><span class="legend-dot" style="background:#3b82f6"></span>{{ __('app.dashboard.route_tracking') }}</span>
+                <span class="ms-auto" style="color:var(--text-muted);font-weight:500">{{ __('app.dashboard.route_est') }}</span>
             </div>
         </div>
 
@@ -172,7 +191,7 @@
 
 {{-- ── LIVE WEATHER STRIP ───────────────────────────────────────────── --}}
 <div class="nb-card mb-4">
-    <div class="nb-card-header"><i class="bi bi-cloud-sun-fill" style="color:var(--secondary)"></i> Live Weather — Major Trade Cities</div>
+    <div class="nb-card-header"><i class="bi bi-cloud-sun-fill" style="color:var(--secondary)"></i> {{ __('app.country.weather') }} — {{ __('app.dashboard.major_ports') }}</div>
     <div class="nb-card-body">
         <div class="row g-2">
             @foreach($weatherCities as $city)
@@ -244,7 +263,7 @@
 
     <div class="col-12 col-md-4">
         <div class="nb-card h-100">
-            <div class="nb-card-header"><i class="bi bi-map"></i> Regional Coverage</div>
+            <div class="nb-card-header"><i class="bi bi-map"></i> {{ __('app.dashboard.regional_coverage') }}</div>
             <div class="nb-card-body">
                 @php
                     $regions = [
@@ -362,8 +381,8 @@ const mapCountries  = @json($mapCountries);
 const weatherCities = @json($weatherCities);
 const portsData     = @json($ports);
 
-let riskMap = null, weatherMap = null, portMap = null;
-let mapsInit = { risk: false, weather: false, ports: false };
+let riskMap = null, routeMap = null, weatherMap = null, portMap = null;
+let mapsInit = { risk: false, route: false, weather: false, ports: false };
 
 function switchMap(tab, btn) {
     document.querySelectorAll('.map-panel').forEach(p => p.classList.remove('active'));
@@ -372,12 +391,14 @@ function switchMap(tab, btn) {
     if (btn) btn.classList.add('active');
 
     if (tab === 'risk'    && !mapsInit.risk)    { initRiskMap();    mapsInit.risk    = true; }
+    if (tab === 'route'   && !mapsInit.route)   { initRouteMap();   mapsInit.route   = true; }
     if (tab === 'weather' && !mapsInit.weather) { initWeatherMap(); mapsInit.weather = true; }
     if (tab === 'ports'   && !mapsInit.ports)   { initPortMap();    mapsInit.ports   = true; }
 
     // Force map to resize correctly after tab reveal
     setTimeout(() => {
         if (tab === 'risk'    && riskMap)    riskMap.invalidateSize();
+        if (tab === 'route'   && routeMap)   routeMap.invalidateSize();
         if (tab === 'weather' && weatherMap) weatherMap.invalidateSize();
         if (tab === 'ports'   && portMap)    portMap.invalidateSize();
     }, 50);
@@ -548,6 +569,95 @@ function initPortMap() {
             fillOpacity: 0.75,
         }).bindPopup(popup).addTo(portMap);
     });
+}
+
+// ── ROUTE MAP ──────────────────────────────────────────────────────────
+let routePolyline = null;
+let originCountry = null;
+let destCountry = null;
+let routeMarkers = [];
+
+function initRouteMap() {
+    routeMap = L.map('routeWorldMap', { zoomControl: true }).setView([20, 10], 2);
+    tileLayer(routeMap);
+
+    // Plot all countries as clickable circles
+    mapCountries.forEach(c => {
+        if (!c.lat || !c.lon) return;
+        L.circleMarker([c.lat, c.lon], {
+            radius: 6,
+            fillColor: '#94a3b8',
+            color: '#fff',
+            weight: 1.5,
+            opacity: 1,
+            fillOpacity: 0.5,
+        })
+        .bindTooltip(c.name)
+        .on('click', () => handleRouteClick(c))
+        .addTo(routeMap);
+    });
+}
+
+function resetRoute() {
+    originCountry = null;
+    destCountry = null;
+    if (routePolyline) routeMap.removeLayer(routePolyline);
+    routeMarkers.forEach(m => routeMap.removeLayer(m));
+    routeMarkers = [];
+    document.getElementById('routeStatusText').innerHTML = '{{ __("app.dashboard.step1") }}';
+    routeMap.closePopup();
+}
+
+function handleRouteClick(c) {
+    if (!originCountry) {
+        originCountry = c;
+        const m = L.circleMarker([c.lat, c.lon], {radius: 8, fillColor: '#10b981', color: '#fff', weight: 2, fillOpacity: 1}).addTo(routeMap).bindPopup('Origin: ' + c.name).openPopup();
+        routeMarkers.push(m);
+        document.getElementById('routeStatusText').innerHTML = '{{ __("app.dashboard.step2") }}';
+    } else if (!destCountry && c.iso3 !== originCountry.iso3) {
+        destCountry = c;
+        const m = L.circleMarker([c.lat, c.lon], {radius: 8, fillColor: '#ef4444', color: '#fff', weight: 2, fillOpacity: 1}).addTo(routeMap).bindPopup('Destination: ' + c.name).openPopup();
+        routeMarkers.push(m);
+        document.getElementById('routeStatusText').innerHTML = '<span class="text-success">{{ __("app.dashboard.route_analyzed") }} ' + originCountry.iso3 + ' ➔ ' + destCountry.iso3 + '</span>';
+        drawRoute();
+    }
+}
+
+function drawRoute() {
+    if (!originCountry || !destCountry) return;
+
+    // Calculate simulated transit risk
+    const distanceRisk = Math.min(20, Math.abs(originCountry.lat - destCountry.lat) + Math.abs(originCountry.lon - destCountry.lon) / 2);
+    const averageRisk = (originCountry.risk + destCountry.risk) / 2;
+    const totalRisk = Math.min(100, Math.round(averageRisk + distanceRisk));
+    
+    let riskLabel = totalRisk < 40 ? 'Safe Route' : (totalRisk < 70 ? 'Moderate Risk' : 'High Risk');
+    let color = totalRisk < 40 ? '#10b981' : (totalRisk < 70 ? '#f59e0b' : '#ef4444');
+
+    const latlngs = [
+        [originCountry.lat, originCountry.lon],
+        [destCountry.lat, destCountry.lon]
+    ];
+    routePolyline = L.polyline(latlngs, {color: color, weight: 4, dashArray: '10, 10', opacity: 0.9}).addTo(routeMap);
+    routeMap.fitBounds(routePolyline.getBounds(), { padding: [50, 50] });
+
+    const popupHTML = `
+        <div style="font-family:'Plus Jakarta Sans',sans-serif; text-align:center;">
+            <div style="font-weight:700; margin-bottom:5px">Route Analysis</div>
+            <div>${originCountry.flag} ${originCountry.iso3} ➔ ${destCountry.flag} ${destCountry.iso3}</div>
+            <div style="margin-top:10px;">
+                <span style="background:${color}; color:#fff; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:12px;">
+                    Transit Risk: ${totalRisk}/100
+                </span>
+            </div>
+            <div style="font-size:11px; margin-top:5px; color:#64748b;">${riskLabel}</div>
+        </div>
+    `;
+    
+    L.popup()
+        .setLatLng([(originCountry.lat + destCountry.lat)/2, (originCountry.lon + destCountry.lon)/2])
+        .setContent(popupHTML)
+        .openOn(routeMap);
 }
 
 // ── INIT FIRST MAP ON LOAD ────────────────────────────────────────────

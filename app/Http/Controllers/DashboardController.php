@@ -81,11 +81,19 @@ class DashboardController extends Controller
             return $result;
         });
 
-        $mapCountries = Cache::remember('dashboard_map_countries', 7200, function () use ($countries) {
+        $mapCountries = Cache::remember('dashboard_map_countries_all', 7200, function () use ($countries) {
             $riskData = [];
-            $sample = $countries->whereNotNull('latitude')->whereNotNull('longitude')->take(40);
-            foreach ($sample as $c) {
-                $w = $this->weather->getWeather((float)$c->latitude, (float)$c->longitude);
+            $allValidCountries = $countries->whereNotNull('latitude')->whereNotNull('longitude')->values();
+            
+            $coords = [];
+            foreach ($allValidCountries as $i => $c) {
+                $coords[$i] = ['lat' => (float)$c->latitude, 'lon' => (float)$c->longitude];
+            }
+            
+            $batchWeather = $this->weather->getBatchWeather($coords);
+            
+            foreach ($allValidCountries as $i => $c) {
+                $w = $batchWeather[$i] ?? ['temperature' => 0, 'precipitation' => 0, 'wind_speed' => 0, 'weather_code' => 0];
                 $riskData[] = [
                     'name'     => $c->name,
                     'iso3'     => $c->iso3,
