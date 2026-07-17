@@ -117,9 +117,28 @@ class DashboardController extends Controller
     public function country(Request $request, string $iso3)
     {
         $country      = Country::where('iso3', $iso3)->firstOrFail();
+
+        // Dynamic lazy-load/fill from REST Countries API if critical details are missing
+        if (empty($country->population) || empty($country->capital) || empty($country->languages) || $country->latitude == 0) {
+            $restData = app(\App\Services\RestCountriesService::class)->getCountryData($iso3);
+            if (!empty($restData)) {
+                $country->update(array_filter([
+                    'capital'         => $restData['capital'] ?? $country->capital,
+                    'population'      => $restData['population'] ?? $country->population,
+                    'languages'       => $restData['languages'] ?? $country->languages,
+                    'area'            => $restData['area'] ?? $country->area,
+                    'latitude'        => $restData['latitude'] ?? $country->latitude,
+                    'longitude'       => $restData['longitude'] ?? $country->longitude,
+                    'currency_code'   => $restData['currency_code'] ?? $country->currency_code,
+                    'currency_name'   => $restData['currency_name'] ?? $country->currency_name,
+                    'currency_symbol' => $restData['currency_symbol'] ?? $country->currency_symbol,
+                ]));
+            }
+        }
+
         $weatherData  = $this->weather->getWeather((float)$country->latitude, (float)$country->longitude);
         $economicData = $this->worldBank->getEconomicData($country->iso2);
-        $newsData     = $this->news->fetchNews("logistics trade {$country->name}");
+        $newsData     = $this->news->fetchNews("logistics trade {$country->name}", $country->name);
 
         $weatherRisk   = $this->weather->weatherRiskScore($weatherData);
         $inflationRisk = $this->worldBank->inflationRiskScore($economicData['inflation']);
@@ -163,9 +182,27 @@ class DashboardController extends Controller
 
     private function buildCountryData(Country $country): array
     {
+        // Dynamic lazy-load/fill from REST Countries API if critical details are missing
+        if (empty($country->population) || empty($country->capital) || empty($country->languages) || $country->latitude == 0) {
+            $restData = app(\App\Services\RestCountriesService::class)->getCountryData($country->iso3);
+            if (!empty($restData)) {
+                $country->update(array_filter([
+                    'capital'         => $restData['capital'] ?? $country->capital,
+                    'population'      => $restData['population'] ?? $country->population,
+                    'languages'       => $restData['languages'] ?? $country->languages,
+                    'area'            => $restData['area'] ?? $country->area,
+                    'latitude'        => $restData['latitude'] ?? $country->latitude,
+                    'longitude'       => $restData['longitude'] ?? $country->longitude,
+                    'currency_code'   => $restData['currency_code'] ?? $country->currency_code,
+                    'currency_name'   => $restData['currency_name'] ?? $country->currency_name,
+                    'currency_symbol' => $restData['currency_symbol'] ?? $country->currency_symbol,
+                ]));
+            }
+        }
+
         $weatherData   = $this->weather->getWeather((float)$country->latitude, (float)$country->longitude);
         $economicData  = $this->worldBank->getEconomicData($country->iso2);
-        $newsData      = $this->news->fetchNews("logistics trade {$country->name}");
+        $newsData      = $this->news->fetchNews("logistics trade {$country->name}", $country->name);
         $weatherRisk   = $this->weather->weatherRiskScore($weatherData);
         $inflationRisk = $this->worldBank->inflationRiskScore($economicData['inflation']);
         $newsRisk      = $this->news->newsRiskScore($newsData['negative_pct']);
