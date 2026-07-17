@@ -143,13 +143,33 @@ function loadAnalytics() {
                         data: [r.weather_risk, r.inflation_risk, r.news_risk, r.currency_risk, r.score],
                         backgroundColor: ['#00E5FF','#FF6D00','#FF2D78','#7C4DFF','#FFE500'],
                         borderColor: '#000',
-                        borderWidth: 2
+                        backgroundColor: [
+                            getGradient(ctxRisk, 'rgba(0, 229, 255, 0.85)', 'rgba(0, 229, 255, 0.15)'),
+                            getGradient(ctxRisk, 'rgba(255, 109, 0, 0.85)', 'rgba(255, 109, 0, 0.15)'),
+                            getGradient(ctxRisk, 'rgba(255, 45, 120, 0.85)', 'rgba(255, 45, 120, 0.15)'),
+                            getGradient(ctxRisk, 'rgba(124, 77, 255, 0.85)', 'rgba(124, 77, 255, 0.15)'),
+                            getGradient(ctxRisk, 'rgba(255, 229, 0, 0.85)', 'rgba(255, 229, 0, 0.15)')
+                        ],
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: tooltipConfig
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: fontConfig } },
+                        y: { min: 0, max: 100, grid: gridConfig, ticks: { font: fontConfig } }
+                    }
+                }
             });
 
-            charts.pie = new Chart(document.getElementById('riskPieChart'), {
+            // 2. DOUGHNUT PIE CHART
+            const ctxPie = document.getElementById('riskPieChart').getContext('2d');
+            charts.pie = new Chart(ctxPie, {
                 type: 'doughnut',
                 data: {
                     labels: [
@@ -165,45 +185,90 @@ function loadAnalytics() {
                             (r.news_risk * 0.40).toFixed(2),
                             (r.currency_risk * 0.10).toFixed(2)
                         ],
-                        backgroundColor: ['#00E5FF','#FF6D00','#FF2D78','#7C4DFF'],
-                        borderColor: '#000',
-                        borderWidth: 2
+                        backgroundColor: [
+                            'rgba(0, 229, 255, 0.8)',
+                            'rgba(255, 109, 0, 0.8)',
+                            'rgba(255, 45, 120, 0.8)',
+                            'rgba(124, 77, 255, 0.8)'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 12
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { labels: { font: { family: 'Poppins', weight: '700' } } } } }
+                options: {
+                    responsive: true,
+                    cutout: '72%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { font: fontConfig, boxWidth: 12, padding: 15 }
+                        },
+                        tooltip: tooltipConfig
+                    }
+                }
             });
 
-            charts.weather = new Chart(document.getElementById('weatherChart'), {
+            // 3. WEATHER CHART
+            const ctxWeather = document.getElementById('weatherChart').getContext('2d');
+            charts.weather = new Chart(ctxWeather, {
                 type: 'bar',
                 data: {
                     labels: ['{{ __("app.country.temperature") }} (°C)', '{{ __("app.country.precipitation") }} (mm)', '{{ __("app.country.wind_speed") }} (km/h)'],
                     datasets: [{
-                        label: 'Weather Data',
                         data: [w.temperature || 0, w.precipitation || 0, w.wind_speed || 0],
-                        backgroundColor: ['#00E676','#00E5FF','#FFE500'],
-                        borderColor: '#000',
-                        borderWidth: 2
+                        backgroundColor: [
+                            getGradient(ctxWeather, 'rgba(0, 230, 118, 0.85)', 'rgba(0, 230, 118, 0.15)'),
+                            getGradient(ctxWeather, 'rgba(0, 229, 255, 0.85)', 'rgba(0, 229, 255, 0.15)'),
+                            getGradient(ctxWeather, 'rgba(255, 229, 0, 0.85)', 'rgba(255, 229, 0, 0.15)')
+                        ],
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { display: false } } }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: tooltipConfig
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: fontConfig } },
+                        y: { grid: gridConfig, ticks: { font: fontConfig } }
+                    }
+                }
             });
 
-            charts.econ = new Chart(document.getElementById('econChart'), {
+            // 4. ECON CHART
+            const ctxEcon = document.getElementById('econChart').getContext('2d');
+            charts.econ = new Chart(ctxEcon, {
                 type: 'bar',
                 data: {
                     labels: ['{{ __("app.country.inflation") }} (%)', '{{ __("app.country.gdp") }} (Billion USD)'],
                     datasets: [{
-                        label: 'Economic Indicators',
                         data: [e.inflation || 0, e.gdp ? (e.gdp / 1e9).toFixed(2) : 0],
-                        backgroundColor: ['#FF6D00', '#7C4DFF'],
-                        borderColor: '#000',
-                        borderWidth: 2
+                        backgroundColor: [
+                            getGradient(ctxEcon, 'rgba(255, 109, 0, 0.85)', 'rgba(255, 109, 0, 0.15)'),
+                            getGradient(ctxEcon, 'rgba(124, 77, 255, 0.85)', 'rgba(124, 77, 255, 0.15)')
+                        ],
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { display: false } } }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: tooltipConfig
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: fontConfig } },
+                        y: { grid: gridConfig, ticks: { font: fontConfig } }
+                    }
+                }
             });
         })
-        .catch(() => {
+        .catch((e) => {
+            console.error(e);
             document.getElementById('analyticsLoading').style.display = 'none';
         });
 }

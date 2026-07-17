@@ -121,24 +121,39 @@ function updateChart(from, to) {
     const data = labels.map(c => rates[c] ? parseFloat((rates[c] / fromRate).toFixed(4)) : 0);
 
     if (window.rateChartInstance) window.rateChartInstance.destroy();
-    window.rateChartInstance = new Chart(document.getElementById('rateChart'), {
+    
+    const ctx = document.getElementById('rateChart').getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 0, 200);
+    grad.addColorStop(0, 'rgba(0, 229, 255, 0.85)');
+    grad.addColorStop(1, 'rgba(0, 229, 255, 0.15)');
+
+    window.rateChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
             labels,
             datasets: [{
-                label: `${from} → Other Currencies`,
                 data,
-                backgroundColor: '#00E5FF',
-                borderColor: '#000',
-                borderWidth: 2
+                backgroundColor: grad,
+                borderRadius: 6,
+                borderSkipped: false
             }]
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } },
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleFont: { family: "'Plus Jakarta Sans', sans-serif", weight: 'bold' },
+                    bodyFont: { family: "'Plus Jakarta Sans', sans-serif" },
+                    padding: 10,
+                    cornerRadius: 8,
+                    displayColors: false
+                }
+            },
             scales: {
-                y: { ticks: { font: { family: 'Poppins' } } },
-                x: { ticks: { font: { family: 'Poppins', weight: '600' } } }
+                y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 } } },
+                x: { grid: { display: false }, ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' } } }
             }
         }
     });
