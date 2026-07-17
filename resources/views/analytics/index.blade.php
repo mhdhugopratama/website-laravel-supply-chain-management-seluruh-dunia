@@ -79,6 +79,25 @@ function destroyAll() {
     Object.values(charts).forEach(c => { if (c) c.destroy(); });
 }
 
+// Global Chart Styling Helpers
+const getGradient = (ctx, colorStart, colorEnd) => {
+    const grad = ctx.createLinearGradient(0, 0, 0, 250);
+    grad.addColorStop(0, colorStart);
+    grad.addColorStop(1, colorEnd);
+    return grad;
+};
+
+const fontConfig = { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '500' };
+const gridConfig = { color: 'rgba(0,0,0,0.04)', drawBorder: false };
+const tooltipConfig = {
+    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+    titleFont: { family: "'Plus Jakarta Sans', sans-serif", weight: 'bold' },
+    bodyFont: { family: "'Plus Jakarta Sans', sans-serif" },
+    padding: 10,
+    cornerRadius: 8,
+    displayColors: false
+};
+
 function loadAnalytics() {
     const iso3 = document.getElementById('analyticsCountry').value;
     if (!iso3) return;
@@ -128,7 +147,9 @@ function loadAnalytics() {
                 </div></div>
             `;
 
-            charts.risk = new Chart(document.getElementById('riskChart'), {
+            // 1. RISK CHART
+            const ctxRisk = document.getElementById('riskChart').getContext('2d');
+            charts.risk = new Chart(ctxRisk, {
                 type: 'bar',
                 data: {
                     labels: [
@@ -139,10 +160,7 @@ function loadAnalytics() {
                         '{{ __("app.risk.overall") }}'
                     ],
                     datasets: [{
-                        label: '{{ __("app.risk.score") }}',
                         data: [r.weather_risk, r.inflation_risk, r.news_risk, r.currency_risk, r.score],
-                        backgroundColor: ['#00E5FF','#FF6D00','#FF2D78','#7C4DFF','#FFE500'],
-                        borderColor: '#000',
                         backgroundColor: [
                             getGradient(ctxRisk, 'rgba(0, 229, 255, 0.85)', 'rgba(0, 229, 255, 0.15)'),
                             getGradient(ctxRisk, 'rgba(255, 109, 0, 0.85)', 'rgba(255, 109, 0, 0.15)'),
