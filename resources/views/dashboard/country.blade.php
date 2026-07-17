@@ -228,6 +228,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
+const ports = @json($ports);
+
 const weatherCode = {{ $weatherData['weather_code'] ?? 0 }};
 const windSpeed   = {{ $weatherData['wind_speed'] ?? 0 }};
 const precip      = {{ $weatherData['precipitation'] ?? 0 }};
@@ -241,10 +243,30 @@ const markerHtml = `<div style="width:36px;height:36px;background:${markerColor}
 </div>`;
 
 const icon = L.divIcon({ html: markerHtml, className: '', iconSize: [36, 36], iconAnchor: [18, 18] });
-L.marker([{{ $country->latitude ?? 0 }}, {{ $country->longitude ?? 0 }}], { icon })
+const centerMarker = L.marker([{{ $country->latitude ?? 0 }}, {{ $country->longitude ?? 0 }}], { icon })
     .addTo(map)
-    .bindPopup(`<strong>{{ $country->name }}</strong><br>{{ __('app.country.temperature') }}: {{ $weatherData['temperature'] ?? 'N/A' }}°C<br>{{ __('app.country.wind_speed') }}: {{ $weatherData['wind_speed'] ?? 0 }} km/h`)
+    .bindPopup(`<strong>{{ $country->name }} (Capital/Center)</strong><br>{{ __('app.country.temperature') }}: {{ $weatherData['temperature'] ?? 'N/A' }}°C<br>{{ __('app.country.wind_speed') }}: {{ $weatherData['wind_speed'] ?? 0 }} km/h`)
     .openPopup();
+
+const portMarkers = [];
+if (ports && ports.length > 0) {
+    ports.forEach(p => {
+        const pm = L.circleMarker([p.latitude, p.longitude], {
+            radius: 7,
+            fillColor: '#3b82f6',
+            color: '#fff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.9
+        })
+        .addTo(map)
+        .bindPopup(`<strong><i class="bi bi-anchor"></i> ${p.name}</strong><br>UN/LOCODE: ${p.un_locode || 'N/A'}<br>Type: ${p.type || 'Sea Port'}`);
+        portMarkers.push(pm);
+    });
+
+    const group = new L.featureGroup([centerMarker, ...portMarkers]);
+    map.fitBounds(group.getBounds().pad(0.15));
+}
 
 @auth
 function toggleWatchlist(countryId, btn) {

@@ -134,8 +134,13 @@ class DashboardController extends Controller
                 ->where('country_id', $country->id)->exists();
         }
 
+        $ports = Port::where('country_code', $country->iso3)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get();
+
         return view('dashboard.country', compact(
-            'country', 'weatherData', 'economicData', 'newsData', 'risk', 'inWatchlist'
+            'country', 'weatherData', 'economicData', 'newsData', 'risk', 'inWatchlist', 'ports'
         ));
     }
 

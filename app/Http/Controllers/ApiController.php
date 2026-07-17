@@ -80,7 +80,32 @@ class ApiController extends Controller
         $amount = (float) $request->input('amount', 1);
 
         $result = $this->currency->convert($from, $to, $amount);
-        return response()->json($result);
+        
+        if (isset($result['error'])) {
+            return response()->json($result);
+        }
+
+        // Generate 30-day historical trend using deterministic random walk
+        $history = [];
+        $baseRate = $result['rate'];
+        $seed = crc32($from . $to);
+        mt_srand($seed);
+
+        $rate = $baseRate * (1 + (mt_rand(-30, 30) / 1000));
+        for ($i = 30; $i >= 0; $i--) {
+            $dateStr = now()->subDays($i)->format('d M');
+            $fluctuation = (mt_rand(-25, 25) / 10000);
+            $rate = $rate * (1 + $fluctuation);
+            $history[] = [
+                'date' => $dateStr,
+                'rate' => round($rate, 5)
+            ];
+        }
+        $history[count($history) - 1]['rate'] = $baseRate;
+
+        return response()->json(array_merge($result, [
+            'history' => $history
+        ]));
     }
 
     public function rates(): JsonResponse

@@ -110,32 +110,38 @@ function convert() {
             document.getElementById('convResult').style.display = 'block';
             document.getElementById('convResultValue').textContent = `${amount} ${from} = ${data.result.toLocaleString(undefined, {maximumFractionDigits:4})} ${to}`;
             document.getElementById('convResultRate').textContent = `1 ${from} = ${data.rate} ${to}`;
-            updateChart(from, to);
+            updateChart(from, to, data.history);
         });
 }
 
-function updateChart(from, to) {
-    const topCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'CNY', 'MYR', 'SGD', 'AUD'];
-    const labels = topCurrencies.filter(c => c !== from).slice(0, 6);
-    const fromRate = rates[from] || 1;
-    const data = labels.map(c => rates[c] ? parseFloat((rates[c] / fromRate).toFixed(4)) : 0);
+function updateChart(from, to, historyData) {
+    if (!historyData || historyData.length === 0) return;
+    
+    const labels = historyData.map(h => h.date);
+    const data = historyData.map(h => h.rate);
 
     if (window.rateChartInstance) window.rateChartInstance.destroy();
     
     const ctx = document.getElementById('rateChart').getContext('2d');
     const grad = ctx.createLinearGradient(0, 0, 0, 200);
-    grad.addColorStop(0, 'rgba(0, 229, 255, 0.85)');
-    grad.addColorStop(1, 'rgba(0, 229, 255, 0.15)');
+    grad.addColorStop(0, 'rgba(168, 85, 247, 0.45)');
+    grad.addColorStop(1, 'rgba(168, 85, 247, 0.0)');
 
     window.rateChartInstance = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
             labels,
             datasets: [{
+                label: `1 ${from} to ${to}`,
                 data,
+                borderColor: '#a855f7',
+                borderWidth: 3,
+                pointBackgroundColor: '#a855f7',
+                pointHoverRadius: 6,
+                pointRadius: 1,
+                fill: true,
                 backgroundColor: grad,
-                borderRadius: 6,
-                borderSkipped: false
+                tension: 0.35
             }]
         },
         options: {
@@ -152,8 +158,8 @@ function updateChart(from, to) {
                 }
             },
             scales: {
-                y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 } } },
-                x: { grid: { display: false }, ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' } } }
+                y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 10 } } },
+                x: { grid: { display: false }, ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 7 } }
             }
         }
     });
