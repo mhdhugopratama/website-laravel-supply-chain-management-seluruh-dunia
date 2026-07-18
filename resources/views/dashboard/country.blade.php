@@ -3,12 +3,23 @@
 @section('title', $country->name . ' — SupplyChainIQ')
 @section('meta_description', 'Supply chain risk intelligence for ' . $country->name)
 
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+    #mainMap { height: 350px; width: 100%; border-radius: 0 0 8px 8px; z-index: 1; }
+</style>
+@endpush
+
 @section('content')
 <div class="nb-page-header">
     <div class="container-fluid px-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
             <h1>
-                <span style="font-size:2.2rem">{{ $country->flag_emoji }}</span>
+                @if(!empty($country->iso2))
+                    <img src="https://flagcdn.com/h40/{{ strtolower($country->iso2) }}.png" height="30" alt="Flag" style="border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); vertical-align: middle; margin-right: 8px;">
+                @else
+                    <span style="font-size:2.2rem">🌐</span>
+                @endif
                 {{ $country->name }}
                 <span class="nb-badge nb-badge-info ms-2">{{ $country->iso3 }}</span>
             </h1>
@@ -222,6 +233,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const map = L.map('mainMap').setView([{{ $country->latitude ?? 0 }}, {{ $country->longitude ?? 0 }}], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

@@ -35,7 +35,7 @@ class DashboardController extends Controller
         if (Auth::check()) {
             $watchlist = Auth::user()
                 ->watchedCountries()
-                ->get(['countries.id', 'name', 'iso3', 'flag_emoji'])
+                ->get(['countries.id', 'name', 'iso3', 'flag_emoji', 'iso2'])
                 ->toArray();
         }
 
@@ -61,15 +61,28 @@ class DashboardController extends Controller
             ['name' => 'Moscow',     'lat' =>  55.75, 'lon' =>  37.62, 'country' => 'RUS'],
         ];
 
-        $weatherCities = Cache::remember('dashboard_weather_cities', 1800, function () use ($majorCities) {
+        // Fetch weather for all countries with valid coordinates (replaces limited major cities list)
+        $weatherCities = Cache::remember('dashboard_weather_cities', 1800, function () use ($countries) {
+            // Filter countries that have latitude and longitude
+            $validCountries = $countries->filter(function ($c) {
+                return $c->latitude && $c->longitude;
+            });
+            // Prepare coordinates array preserving original index keys
+            $coords = [];
+            foreach ($validCountries as $i => $c) {
+                $coords[$i] = ['lat' => (float)$c->latitude, 'lon' => (float)$c->longitude];
+            }
+            // Batch request weather for all coordinates
+            $batchWeather = $this->weather->getBatchWeather($coords);
+            // Build result array with weather data per country
             $result = [];
-            foreach ($majorCities as $city) {
-                $w = $this->weather->getWeather($city['lat'], $city['lon']);
+            foreach ($validCountries as $i => $c) {
+                $w = $batchWeather[$i] ?? ['temperature' => 0, 'precipitation' => 0, 'wind_speed' => 0, 'weather_code' => 0];
                 $result[] = [
-                    'name'    => $city['name'],
-                    'country' => $city['country'],
-                    'lat'     => $city['lat'],
-                    'lon'     => $city['lon'],
+                    'name'    => $c->name,
+                    'country' => $c->iso3,
+                    'lat'     => $c->latitude,
+                    'lon'     => $c->longitude,
                     'temp'    => $w['temperature'] ?? 0,
                     'precip'  => $w['precipitation'] ?? 0,
                     'wind'    => $w['wind_speed'] ?? 0,
@@ -107,6 +120,7 @@ class DashboardController extends Controller
 
                 $riskData[] = [
                     'name'     => $c->name,
+                    'iso2'     => $c->iso2,
                     'iso3'     => $c->iso3,
                     'flag'     => $c->flag_emoji,
                     'lat'      => (float)$c->latitude,
@@ -122,6 +136,9 @@ class DashboardController extends Controller
 
         // Top 10 highest risk countries
         $topRiskCountries = collect($mapCountries)->sortByDesc('risk')->take(10)->values()->all();
+
+        // Top 10 lowest risk countries (most secure/stable)
+        $bottomRiskCountries = collect($mapCountries)->sortBy('risk')->take(10)->values()->all();
 
         // Calculate dynamic regional coverage
         $regionalCoverage = Country::groupBy('region')
@@ -149,7 +166,7 @@ class DashboardController extends Controller
             })->toArray();
 
         return view('dashboard.index', compact(
-            'countries', 'watchlist', 'ports', 'weatherCities', 'mapCountries', 'topRiskCountries', 'regionalCoverage'
+            'countries', 'watchlist', 'ports', 'weatherCities', 'mapCountries', 'topRiskCountries', 'bottomRiskCountries', 'regionalCoverage'
         ));
     }
 
@@ -251,6 +268,7 @@ class DashboardController extends Controller
         return [
             'weather'  => $weatherData,
             'economic' => $economicData,
+            'news'     => $newsData,
             'risk'     => $risk,
         ];
     }

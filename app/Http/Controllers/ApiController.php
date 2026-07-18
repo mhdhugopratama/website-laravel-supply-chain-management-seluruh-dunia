@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use App\Models\Port;
-use App\Services\NewsService;
 use App\Services\CurrencyService;
+use App\Services\NewsService;
+use App\Services\RiskEngine;
 use App\Services\WeatherService;
 use App\Services\WorldBankService;
-use App\Services\RiskEngine;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
@@ -28,32 +28,33 @@ class ApiController extends Controller
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%");
         }
+
         return response()->json($query->get());
     }
 
     public function risk(Request $request): JsonResponse
     {
-        $iso3    = $request->input('iso3');
+        $iso3 = $request->input('iso3');
         $country = Country::where('iso3', $iso3)->firstOrFail();
 
-        $weatherData   = $this->weather->getWeather((float)$country->latitude, (float)$country->longitude);
-        $economicData  = $this->worldBank->getEconomicData($country->iso2);
-        $newsData      = $this->news->fetchNews("logistics {$country->name}", $country->name);
+        $weatherData = $this->weather->getWeather((float) $country->latitude, (float) $country->longitude);
+        $economicData = $this->worldBank->getEconomicData($country->iso2);
+        $newsData = $this->news->fetchNews("logistics {$country->name}", $country->name);
 
-        $weatherRisk   = $this->weather->weatherRiskScore($weatherData);
+        $weatherRisk = $this->weather->weatherRiskScore($weatherData);
         $inflationRisk = $this->worldBank->inflationRiskScore($economicData['inflation']);
-        $newsRisk      = $this->news->newsRiskScore($newsData['negative_pct']);
-        $currencyRisk  = $this->currency->currencyRiskScore($country->currency_code);
+        $newsRisk = $this->news->newsRiskScore($newsData['negative_pct']);
+        $currencyRisk = $this->currency->currencyRiskScore($country->currency_code);
 
         $risk = $this->riskEngine->calculate($weatherRisk, $inflationRisk, $newsRisk, $currencyRisk);
 
         return response()->json(array_merge($risk, [
-            'country'   => $country->name,
-            'weather'   => $weatherData,
-            'economic'  => $economicData,
+            'country' => $country->name,
+            'weather' => $weatherData,
+            'economic' => $economicData,
             'sentiment' => [
                 'positive' => $newsData['positive_pct'],
-                'neutral'  => $newsData['neutral_pct'],
+                'neutral' => $newsData['neutral_pct'],
                 'negative' => $newsData['negative_pct'],
             ],
         ]));
@@ -62,15 +63,15 @@ class ApiController extends Controller
     // New endpoint: returns sentiment percentages for a given country ISO3
     public function sentiment(Request $request): JsonResponse
     {
-        $iso3    = $request->input('iso3');
+        $iso3 = $request->input('iso3');
         $country = Country::where('iso3', $iso3)->firstOrFail();
         $newsData = $this->news->fetchNews("logistics {$country->name}", $country->name);
 
         return response()->json([
-            'country'   => $country->name,
+            'country' => $country->name,
             'sentiment' => [
                 'positive' => $newsData['positive_pct'],
-                'neutral'  => $newsData['neutral_pct'],
+                'neutral' => $newsData['neutral_pct'],
                 'negative' => $newsData['negative_pct'],
             ],
         ]);
@@ -85,26 +86,27 @@ class ApiController extends Controller
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%");
         }
-        return response()->json($query->limit(500)->get());
-    }
 
+        return response()->json($query->limit(500)->get());
     }
 
     public function news(Request $request): JsonResponse
     {
-        $query  = $request->input('q', 'logistics shipping trade economy');
-        $result = $this->news->fetchNews($query);
+        $query = $request->input('q', 'logistics shipping trade economy');
+        $forceRefresh = $request->has('refresh');
+        $result = $this->news->fetchNews($query, null, $forceRefresh);
+
         return response()->json($result);
     }
 
     public function currency(Request $request): JsonResponse
     {
-        $from   = strtoupper($request->input('from', 'USD'));
-        $to     = strtoupper($request->input('to', 'EUR'));
+        $from = strtoupper($request->input('from', 'USD'));
+        $to = strtoupper($request->input('to', 'EUR'));
         $amount = (float) $request->input('amount', 1);
 
         $result = $this->currency->convert($from, $to, $amount);
-        
+
         if (isset($result['error'])) {
             return response()->json($result);
         }
@@ -112,7 +114,7 @@ class ApiController extends Controller
         // Generate 30-day historical trend using deterministic random walk
         $history = [];
         $baseRate = $result['rate'];
-        $seed = crc32($from . $to);
+        $seed = crc32($from.$to);
         mt_srand($seed);
 
         $rate = $baseRate * (1 + (mt_rand(-30, 30) / 1000));
@@ -122,28 +124,30 @@ class ApiController extends Controller
             $rate = $rate * (1 + $fluctuation);
             $history[] = [
                 'date' => $dateStr,
-                'rate' => round($rate, 5)
+                'rate' => round($rate, 5),
             ];
         }
         $history[count($history) - 1]['rate'] = $baseRate;
 
         return response()->json(array_merge($result, [
-            'history' => $history
+            'history' => $history,
         ]));
     }
 
     public function rates(): JsonResponse
     {
         $rates = $this->currency->getRates();
+
         return response()->json(['rates' => $rates]);
     }
 
     public function weather(Request $request): JsonResponse
     {
-        $iso3    = $request->input('iso3');
+        $iso3 = $request->input('iso3');
         $country = Country::where('iso3', $iso3)->firstOrFail();
-        $data    = $this->weather->getWeather((float)$country->latitude, (float)$country->longitude);
-        $data['label'] = $this->weather->weatherLabel((int)$data['weather_code']);
+        $data = $this->weather->getWeather((float) $country->latitude, (float) $country->longitude);
+        $data['label'] = $this->weather->weatherLabel((int) $data['weather_code']);
+
         return response()->json($data);
     }
 }

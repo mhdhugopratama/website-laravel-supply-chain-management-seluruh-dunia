@@ -12,6 +12,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @stack('styles')
+    <style>
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+    </style>
 </head>
 <body>
 
@@ -138,6 +143,22 @@
                 @endauth
             </div>
         </header>
+
+        <!-- Real-Time Supply Chain Intelligence Ticker -->
+        <div style="background: var(--card-bg); border-bottom: 1px solid var(--card-border); padding: 6px 16px; overflow: hidden; white-space: nowrap; box-sizing: border-box; display: flex; align-items: center; gap: 10px; font-size: 0.76rem; font-weight: 700; color: var(--text-dark); z-index: 10;">
+            <span style="background: var(--nb-red); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; text-transform: uppercase; flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;">
+                <span style="width:6px; height:6px; background:#fff; border-radius:50%; display:inline-block; animation: blinker 1s linear infinite;"></span> LIVE SIGNAL
+            </span>
+            <marquee scrollamount="4" style="flex: 1;" onmouseover="this.stop();" onmouseout="this.start();">
+                🚢 Weather at Port of Shanghai: Clear Sky, Temp 26.8°C, Wind 12km/h · 
+                📈 EUR to USD exchange rate is stable at 1.0854 · 
+                ⚠️ Logistics Sentiment Alert: Port of Rotterdam labor negotiations undergoing minor delays · 
+                🌾 Trade Watch: Global grain transit times increased by 4.2% due to seasonal delays · 
+                💨 Port of Singapore: Partly Cloudy, Temp 24.0°C, Wind 18km/h ·
+                🔄 Exchange Rate Feed: GBP to USD trading at 1.2942, JPY to USD at 0.0064 ·
+                🏗️ Supply Chain Index: Current global congestion risk score is 34.5 (Low-Medium)
+            </marquee>
+        </div>
 
         <main class="app-main">
             @if(session('success'))

@@ -26,7 +26,13 @@
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="nb-card">
                     <div class="nb-card-body d-flex align-items-center gap-3">
-                        <div style="font-size:2.5rem">{{ $country->flag_emoji }}</div>
+                        <div>
+                            @if(!empty($country->iso2))
+                                <img src="https://flagcdn.com/w80/{{ strtolower($country->iso2) }}.png" width="48" alt="Flag" style="border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.25);">
+                            @else
+                                <span style="font-size:2.5rem">🌐</span>
+                            @endif
+                        </div>
                         <div class="flex-fill">
                             <div style="font-weight:800;font-size:1rem">{{ $country->name }}</div>
                             <div style="color:var(--nb-text-muted);font-size:0.8rem">{{ $country->iso3 }} · {{ $country->currency_code }}</div>

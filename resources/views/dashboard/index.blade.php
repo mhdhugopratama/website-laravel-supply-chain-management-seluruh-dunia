@@ -236,9 +236,38 @@
     </div>
 </div>
 
-{{-- ── ROW: Search + Overview + Quick Actions ──────────────────────── --}}
 <div class="row g-3 mb-4">
-    <div class="col-12 col-md-6">
+    {{-- Column 1: Top 10 Lowest Risk --}}
+    <div class="col-12 col-md-4">
+        <div class="nb-card h-100">
+            <div class="nb-card-header"><i class="bi bi-shield-fill-check" style="color:var(--nb-green)"></i> {{ __('Top 10 Negara Paling Aman') }}</div>
+            <div class="nb-card-body">
+                <div style="max-height: 280px; overflow-y: auto; padding-right: 5px;">
+                    @foreach($bottomRiskCountries as $bc)
+                    @php
+                        $badgeClass = $bc['risk'] < 30 ? 'success' : ($bc['risk'] < 60 ? 'warning' : 'danger');
+                    @endphp
+                    <div class="d-flex align-items-center justify-content-between py-1" style="border-bottom: 1px solid var(--card-border)">
+                        <a href="{{ route('country.show', $bc['iso3']) }}" class="d-flex align-items-center gap-2 text-decoration-none py-1">
+                            @if(!empty($bc['iso2']))
+                                <img src="https://flagcdn.com/w20/{{ strtolower($bc['iso2']) }}.png" width="16" alt="Flag" style="border-radius: 2px;">
+                            @else
+                                <span style="font-size: 1rem;">🌐</span>
+                            @endif
+                            <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-dark)">{{ $bc['name'] }}</span>
+                        </a>
+                        <span class="nb-badge nb-badge-{{ $badgeClass }}" style="font-size: 0.70rem;">
+                            Risk: {{ round($bc['risk']) }}%
+                        </span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Column 2: Regional Coverage --}}
+    <div class="col-12 col-md-4">
         <div class="nb-card h-100">
             <div class="nb-card-header"><i class="bi bi-map"></i> {{ __('app.dashboard.regional_coverage') }}</div>
             <div class="nb-card-body">
@@ -263,18 +292,23 @@
         </div>
     </div>
 
-    <div class="col-12 col-md-6">
+    {{-- Column 3: Top 10 Highest Risk --}}
+    <div class="col-12 col-md-4">
         <div class="nb-card h-100">
             <div class="nb-card-header"><i class="bi bi-exclamation-triangle-fill" style="color:var(--red)"></i> {{ __('Top 10 Negara Paling Berisiko') }}</div>
-            <div class="nb-card-body d-flex flex-column justify-content-between">
-                <div style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+            <div class="nb-card-body">
+                <div style="max-height: 280px; overflow-y: auto; padding-right: 5px;">
                     @foreach($topRiskCountries as $tc)
                     @php
                         $badgeClass = $tc['risk'] < 30 ? 'success' : ($tc['risk'] < 60 ? 'warning' : 'danger');
                     @endphp
                     <div class="d-flex align-items-center justify-content-between py-1" style="border-bottom: 1px solid var(--card-border)">
                         <a href="{{ route('country.show', $tc['iso3']) }}" class="d-flex align-items-center gap-2 text-decoration-none py-1">
-                            <span style="font-size: 1.15rem;">{{ $tc['flag'] }}</span>
+                            @if(!empty($tc['iso2']))
+                                <img src="https://flagcdn.com/w20/{{ strtolower($tc['iso2']) }}.png" width="16" alt="Flag" style="border-radius: 2px;">
+                            @else
+                                <span style="font-size: 1rem;">🌐</span>
+                            @endif
                             <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-dark)">{{ $tc['name'] }}</span>
                         </a>
                         <span class="nb-badge nb-badge-{{ $badgeClass }}" style="font-size: 0.70rem;">
@@ -282,15 +316,6 @@
                         </span>
                     </div>
                     @endforeach
-                </div>
-
-                <div class="mt-3 d-flex flex-wrap gap-2">
-                    <a href="{{ route('compare') }}" class="nb-btn nb-btn-dark" style="flex:1;justify-content:center;font-size:0.78rem">
-                        <i class="bi bi-arrows-angle-expand"></i> Compare
-                    </a>
-                    <a href="{{ route('analytics.index') }}" class="nb-btn nb-btn-cyan" style="flex:1;justify-content:center;font-size:0.78rem">
-                        <i class="bi bi-bar-chart-line-fill"></i> Analytics
-                    </a>
                 </div>
             </div>
         </div>
@@ -307,7 +332,13 @@
         <div class="col-6 col-sm-4 col-md-3 col-xl-2">
             <a href="{{ route('country.show', $w['iso3']) }}" class="text-decoration-none">
                 <div class="nb-card text-center" style="padding:12px 8px">
-                    <div style="font-size:1.7rem;line-height:1">{{ $w['flag_emoji'] }}</div>
+                    <div style="margin-bottom: 6px;">
+                        @if(!empty($w['iso2']))
+                            <img src="https://flagcdn.com/w40/{{ strtolower($w['iso2']) }}.png" width="30" alt="Flag" style="border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                        @else
+                            <span style="font-size:1.7rem;line-height:1">🌐</span>
+                        @endif
+                    </div>
                     <div style="font-weight:700;font-size:0.79rem;margin-top:6px;color:var(--text-dark)">{{ $w['name'] }}</div>
                     <span class="nb-badge nb-badge-info mt-1">{{ $w['iso3'] }}</span>
                 </div>
@@ -326,7 +357,13 @@
     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
         <a href="{{ route('country.show', $country->iso3) }}" class="text-decoration-none">
             <div class="nb-card text-center fade-in-up" style="padding:10px 6px">
-                <div style="font-size:1.55rem;line-height:1">{{ $country->flag_emoji }}</div>
+                <div style="margin-bottom: 6px;">
+                    @if(!empty($country->iso2))
+                        <img src="https://flagcdn.com/w40/{{ strtolower($country->iso2) }}.png" width="30" alt="Flag" style="border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    @else
+                        <span style="font-size:1.55rem;line-height:1">🌐</span>
+                    @endif
+                </div>
                 <div style="font-weight:600;font-size:0.74rem;margin-top:5px;color:var(--text-dark);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $country->name }}</div>
                 <div style="font-size:0.62rem;color:var(--text-muted);font-weight:600;margin-top:2px">{{ $country->iso3 }}</div>
             </div>
@@ -370,14 +407,7 @@ function switchMap(tab, btn) {
         if (tab === 'route'   && routeMap)   routeMap.invalidateSize();
         if (tab === 'weather' && weatherMap) weatherMap.invalidateSize();
         if (tab === 'ports'   && portMap)    portMap.invalidateSize();
-    }, 50);
-}
-
-function tileLayer(map) {
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap',
-        maxZoom: 18,
-    }).addTo(map);
+    }, 100);
 }
 
 function riskColor(score) {
@@ -391,6 +421,12 @@ function tempColor(temp) {
     if (temp < 25) return '#10b981';
     if (temp < 35) return '#f97316';
     return '#ef4444';
+}
+
+function tileLayer(map) {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 }
 
 function circleMarker(lat, lon, color, radius, popup, map) {
@@ -639,23 +675,27 @@ window.addEventListener('load', function() {
 const searchInput = document.getElementById('countrySearch');
 const dropdown    = document.getElementById('countryDropdown');
 
-searchInput.addEventListener('input', function() {
-    const val = this.value.trim().toLowerCase();
-    if (val.length < 1) { dropdown.classList.remove('show'); return; }
-    const matches = allCountries.filter(c => c.name.toLowerCase().includes(val)).slice(0, 10);
-    if (!matches.length) { dropdown.classList.remove('show'); return; }
-    dropdown.innerHTML = matches.map(c =>
-        `<div class="country-dropdown-item" onclick="window.location='/country/${c.iso3}'">
-            <span>${c.flag_emoji || '🌍'}</span>
-            <span>${c.name}</span>
-            <span class="ms-auto nb-badge nb-badge-info">${c.iso3}</span>
-        </div>`
-    ).join('');
-    dropdown.classList.add('show');
-});
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        const val = this.value.trim().toLowerCase();
+        if (val.length < 1) { dropdown.classList.remove('show'); return; }
+        const matches = allCountries.filter(c => c.name.toLowerCase().includes(val)).slice(0, 10);
+        if (!matches.length) { dropdown.classList.remove('show'); return; }
+        dropdown.innerHTML = matches.map(c => {
+            const flagUrl = c.iso2 ? `https://flagcdn.com/w20/${c.iso2.toLowerCase()}.png` : '';
+            const flagHtml = flagUrl ? `<img src="${flagUrl}" width="16" style="border-radius:2px; vertical-align:middle; margin-right:4px;">` : '🌍';
+            return `<div class="country-dropdown-item" onclick="window.location='/country/${c.iso3}'">
+                <span>${flagHtml}</span>
+                <span>${c.name}</span>
+                <span class="ms-auto nb-badge nb-badge-info">${c.iso3}</span>
+            </div>`;
+        }).join('');
+        dropdown.classList.add('show');
+    });
+}
 
 document.addEventListener('click', e => {
-    if (!e.target.closest('.nb-search-box')) dropdown.classList.remove('show');
+    if (!e.target.closest('.nb-search-box') && dropdown) dropdown.classList.remove('show');
 });
 
 // ── LOAD MORE COUNTRIES ───────────────────────────────────────────────
@@ -665,9 +705,11 @@ function loadMoreCountries() {
     allCountries.slice(30).forEach(c => {
         const d = document.createElement('div');
         d.className = 'col-6 col-sm-4 col-md-3 col-lg-2';
+        const flagUrl = c.iso2 ? `https://flagcdn.com/w40/${c.iso2.toLowerCase()}.png` : '';
+        const flagHtml = flagUrl ? `<img src="${flagUrl}" width="30" alt="Flag" style="border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">` : '<span style="font-size:1.55rem;line-height:1">🌐</span>';
         d.innerHTML = `<a href="/country/${c.iso3}" class="text-decoration-none">
             <div class="nb-card text-center fade-in-up" style="padding:10px 6px">
-                <div style="font-size:1.55rem;line-height:1">${c.flag_emoji || '🌍'}</div>
+                <div style="margin-bottom: 6px;">${flagHtml}</div>
                 <div style="font-weight:600;font-size:0.74rem;margin-top:5px;color:var(--text-dark);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div>
                 <div style="font-size:0.62rem;color:var(--text-muted);font-weight:600;margin-top:2px">${c.iso3}</div>
             </div>

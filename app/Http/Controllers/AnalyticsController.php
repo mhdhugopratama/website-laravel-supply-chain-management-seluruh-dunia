@@ -21,7 +21,7 @@ class AnalyticsController extends Controller
 
     public function index()
     {
-        $countries = Country::orderBy('name')->get(['id', 'name', 'iso3', 'flag_emoji']);
+        $countries = Country::orderBy('name')->get(['id', 'name', 'iso3', 'flag_emoji', 'iso2']);
         return view('analytics.index', compact('countries'));
     }
 
@@ -60,6 +60,7 @@ class AnalyticsController extends Controller
             'country'  => $country,
             'weather'  => $weatherData,
             'economic' => $economicData,
+            'news'     => $newsData,
             'risk'     => $risk,
         ]);
     }
