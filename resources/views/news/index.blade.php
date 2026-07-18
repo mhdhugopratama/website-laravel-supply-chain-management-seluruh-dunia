@@ -10,12 +10,15 @@
             <h1 class="fw-bold mb-1" style="color: var(--nb-text);"><i class="bi bi-globe-americas text-primary"></i> {{ __('app.news.global_trade_intel') }}</h1>
             <p class="text-muted mb-0">{{ __('app.news.global_trade_desc') }}</p>
         </div>
-        <div class="d-none d-md-block">
-            <span class="badge {{ $data['from_cache'] ? 'bg-secondary' : 'bg-success' }} bg-opacity-75 p-2 rounded-pill shadow-sm" style="backdrop-filter: blur(5px);">
+        <div class="d-flex align-items-center gap-2">
+            <a href="?q={{ urlencode($query) }}&refresh=1" class="btn btn-sm btn-outline-primary rounded-pill shadow-sm py-2 px-3 fw-bold">
+                <i class="bi bi-arrow-clockwise"></i> {{ __('Refresh Live News') }}
+            </a>
+            <span class="badge {{ $data['from_cache'] ? 'bg-info text-dark' : 'bg-success' }} bg-opacity-75 p-2 rounded-pill shadow-sm" style="backdrop-filter: blur(5px);">
                 @if($data['from_cache'])
-                    <i class="bi bi-archive-fill"></i> {{ __('app.news.cached_result') }}
+                    <i class="bi bi-shield-check"></i> {{ __('Auto-Optimized Cache') }}
                 @else
-                    <i class="bi bi-record-circle text-danger"></i> {{ __('app.news.live_stream') }}
+                    <i class="bi bi-record-circle text-danger"></i> {{ __('Live Stream') }}
                 @endif
             </span>
         </div>
@@ -24,7 +27,7 @@
     <!-- Controls and Sentiment Row -->
     <div class="row g-4 mb-4">
         <!-- Search and Filter Panel -->
-        <div class="col-12 col-xl-7">
+        <div class="col-12 col-xl-6">
             <div class="nb-card h-100 p-4 border-0 shadow-sm" style="background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(15px); border-radius: 16px;">
                 <h5 class="fw-bold mb-3"><i class="bi bi-funnel-fill text-primary"></i> {{ __('app.news.intel_filters') }}</h5>
                 <form method="GET" action="{{ route('news.index') }}">
@@ -52,9 +55,14 @@
         </div>
 
         <!-- Sentiment Analysis Panel -->
-        <div class="col-12 col-xl-5">
+        <div class="col-12 col-xl-6">
             <div class="nb-card h-100 p-4 border-0 shadow-sm" style="background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(15px); border-radius: 16px;">
-                <h5 class="fw-bold mb-3"><i class="bi bi-activity text-danger"></i> {{ __('app.news.market_sentiment') }}</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-activity text-danger"></i> {{ __('app.news.market_sentiment') }}</h5>
+                    <span class="badge {{ $data['sentiment'] === 'Positive' ? 'bg-success' : ($data['sentiment'] === 'Negative' ? 'bg-danger' : 'bg-warning text-dark') }} px-3 py-2 rounded-pill shadow-sm fw-bold">
+                        Sentiment: {{ $data['sentiment'] ?? 'Neutral' }}
+                    </span>
+                </div>
                 <div class="sentiment-bar mb-3 shadow-sm rounded-pill overflow-hidden d-flex" style="height:25px; background: rgba(0,0,0,0.05);">
                     <div class="bg-success text-white text-center fw-bold" style="width:{{ $data['positive_pct'] }}%; font-size: 0.75rem; line-height: 25px; transition: width 1s ease;">
                         {{ $data['positive_pct'] > 5 ? $data['positive_pct'].'%' : '' }}
@@ -66,10 +74,11 @@
                         {{ $data['negative_pct'] > 5 ? $data['negative_pct'].'%' : '' }}
                     </div>
                 </div>
-                <div class="row text-center mt-3">
+                <div class="row text-center mt-3 g-2">
                     <div class="col-4">
                         <div class="fs-4 fw-bold text-success">{{ $data['positive_pct'] }}%</div>
                         <div class="text-muted small text-uppercase fw-bold">{{ __('app.news.pos_growth') }}</div>
+                        <div class="text-muted extra-small">({{ $data['pos_count'] ?? 0 }} words)</div>
                     </div>
                     <div class="col-4">
                         <div class="fs-4 fw-bold text-warning">{{ $data['neutral_pct'] }}%</div>
@@ -78,6 +87,7 @@
                     <div class="col-4">
                         <div class="fs-4 fw-bold text-danger">{{ $data['negative_pct'] }}%</div>
                         <div class="text-muted small text-uppercase fw-bold">{{ __('app.news.risk_neg') }}</div>
+                        <div class="text-muted extra-small">({{ $data['neg_count'] ?? 0 }} words)</div>
                     </div>
                 </div>
             </div>

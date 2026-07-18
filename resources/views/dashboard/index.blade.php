@@ -238,44 +238,14 @@
 
 {{-- ── ROW: Search + Overview + Quick Actions ──────────────────────── --}}
 <div class="row g-3 mb-4">
-    <div class="col-12 col-md-4">
-        <div class="nb-card h-100">
-            <div class="nb-card-header"><i class="bi bi-search"></i> {{ __('app.dashboard.search_title') }}</div>
-            <div class="nb-card-body">
-                <div class="nb-search-box">
-                    <input type="text" id="countrySearch" class="nb-input" placeholder="{{ __('app.dashboard.search_placeholder') }}" autocomplete="off">
-                    <div class="country-dropdown" id="countryDropdown"></div>
-                </div>
-                <p class="mt-2 mb-3" style="font-size:0.74rem;color:var(--text-muted)">{{ __('app.dashboard.search_hint') }}</p>
-                <div class="d-flex flex-wrap gap-1">
-                    @foreach(['USA','CHN','DEU','JPN','GBR','IND','SGP','ARE'] as $iso)
-                    @php $c = $countries->firstWhere('iso3', $iso); @endphp
-                    @if($c)
-                    <a href="{{ route('country.show', $c->iso3) }}" class="nb-btn nb-btn-outline" style="padding:3px 9px;font-size:0.73rem">
-                        {{ $c->flag_emoji }} {{ $c->iso3 }}
-                    </a>
-                    @endif
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-6">
         <div class="nb-card h-100">
             <div class="nb-card-header"><i class="bi bi-map"></i> {{ __('app.dashboard.regional_coverage') }}</div>
             <div class="nb-card-body">
                 @php
-                    $regions = [
-                        ['name'=>'Europe',              'count'=>18, 'color'=>'var(--primary)'],
-                        ['name'=>'Asia Pacific',        'count'=>14, 'color'=>'var(--teal)'],
-                        ['name'=>'Americas',            'count'=>12, 'color'=>'var(--secondary)'],
-                        ['name'=>'Middle East & Africa','count'=>10, 'color'=>'var(--amber)'],
-                        ['name'=>'South Asia',          'count'=>6,  'color'=>'var(--green)'],
-                    ];
-                    $total = array_sum(array_column($regions,'count'));
+                    $total = array_sum(array_column($regionalCoverage, 'count'));
                 @endphp
-                @foreach($regions as $r)
+                @foreach($regionalCoverage as $r)
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <div style="width:24px;height:24px;background:{{ $r['color'] }}20;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
                         <i class="bi bi-geo-alt-fill" style="color:{{ $r['color'] }};font-size:0.65rem"></i>
@@ -283,7 +253,7 @@
                     <div style="flex:1;min-width:0">
                         <div style="font-size:0.76rem;font-weight:600;color:var(--text-dark)">{{ $r['name'] }}</div>
                         <div class="risk-meter mt-1">
-                            <div class="risk-meter-fill" style="width:{{ round($r['count']/$total*100) }}%;background:{{ $r['color'] }}"></div>
+                            <div class="risk-meter-fill" style="width:{{ $total > 0 ? round($r['count'] / $total * 100) : 0 }}%;background:{{ $r['color'] }}"></div>
                         </div>
                     </div>
                     <span style="font-size:0.76rem;font-weight:700;color:var(--text-muted)">{{ $r['count'] }}</span>
@@ -293,27 +263,26 @@
         </div>
     </div>
 
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-6">
         <div class="nb-card h-100">
-            <div class="nb-card-header"><i class="bi bi-lightning-fill"></i> API Status</div>
-            <div class="nb-card-body">
-                @php $apis = [
-                    ['name'=>'Open-Meteo (Weather)',  'badge'=>'success','dot'=>'var(--green)'],
-                    ['name'=>'World Bank (Economic)', 'badge'=>'success','dot'=>'var(--green)'],
-                    ['name'=>'GNews (News Feed)',     'badge'=>'warning','dot'=>'var(--amber)'],
-                    ['name'=>'ExchangeRate API',      'badge'=>'success','dot'=>'var(--green)'],
-                    ['name'=>'REST Countries',        'badge'=>'success','dot'=>'var(--green)'],
-                    ['name'=>'OpenStreetMap (Maps)',  'badge'=>'success','dot'=>'var(--green)'],
-                ]; @endphp
-                @foreach($apis as $api)
-                <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom:1px solid var(--card-border)">
-                    <span style="font-size:0.78rem;font-weight:500;color:var(--text-body)">{{ $api['name'] }}</span>
-                    <span class="nb-badge nb-badge-{{ $api['badge'] }}">
-                        <span style="width:5px;height:5px;border-radius:50%;background:{{ $api['dot'] }};display:inline-block;margin-right:3px"></span>
-                        {{ $api['badge'] === 'success' ? 'Online' : 'Cached' }}
-                    </span>
+            <div class="nb-card-header"><i class="bi bi-exclamation-triangle-fill" style="color:var(--red)"></i> {{ __('Top 10 Negara Paling Berisiko') }}</div>
+            <div class="nb-card-body d-flex flex-column justify-content-between">
+                <div style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+                    @foreach($topRiskCountries as $tc)
+                    @php
+                        $badgeClass = $tc['risk'] < 30 ? 'success' : ($tc['risk'] < 60 ? 'warning' : 'danger');
+                    @endphp
+                    <div class="d-flex align-items-center justify-content-between py-1" style="border-bottom: 1px solid var(--card-border)">
+                        <a href="{{ route('country.show', $tc['iso3']) }}" class="d-flex align-items-center gap-2 text-decoration-none py-1">
+                            <span style="font-size: 1.15rem;">{{ $tc['flag'] }}</span>
+                            <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-dark)">{{ $tc['name'] }}</span>
+                        </a>
+                        <span class="nb-badge nb-badge-{{ $badgeClass }}" style="font-size: 0.70rem;">
+                            Risk: {{ round($tc['risk']) }}%
+                        </span>
+                    </div>
+                    @endforeach
                 </div>
-                @endforeach
 
                 <div class="mt-3 d-flex flex-wrap gap-2">
                     <a href="{{ route('compare') }}" class="nb-btn nb-btn-dark" style="flex:1;justify-content:center;font-size:0.78rem">

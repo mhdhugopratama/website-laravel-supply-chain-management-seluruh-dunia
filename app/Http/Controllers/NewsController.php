@@ -12,7 +12,8 @@ class NewsController extends Controller
     public function index(Request $request)
     {
         $query = $request->input('q', 'logistics shipping trade economy');
-        $data  = $this->news->fetchNews($query);
+        $forceRefresh = $request->has('refresh');
+        $data  = $this->news->fetchNews($query, null, $forceRefresh);
         return view('news.index', compact('data', 'query'));
     }
 }

@@ -6,32 +6,57 @@ use App\Models\NewsCache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Carbon;
 
+use Illuminate\Support\Facades\DB;
+
 class NewsService
 {
-    private array $positiveWords = [
-        'growth', 'increase', 'profit', 'stable', 'improve', 'surge',
-        'boost', 'recovery', 'expansion', 'gain', 'rise', 'success',
-        'opportunity', 'demand', 'strong', 'robust', 'advance', 'breakthrough',
-    ];
+    private array $positiveWords = [];
+    private array $negativeWords = [];
 
-    private array $negativeWords = [
-        'war', 'crisis', 'inflation', 'delay', 'disaster', 'strike',
-        'shortage', 'congestion', 'conflict', 'disruption', 'collapse',
-        'decline', 'recession', 'tariff', 'sanction', 'loss', 'risk',
-        'attack', 'blockage', 'halt', 'suspend', 'ban', 'threat',
-    ];
+    public function __construct()
+    {
+        // Load lexicon from database tables; fallback to hardcoded defaults if tables are empty
+        $this->positiveWords = DB::table('positive_words')->pluck('word')->toArray();
+        $this->negativeWords = DB::table('negative_words')->pluck('word')->toArray();
 
-    public function fetchNews(string $query = 'logistics shipping trade economy', ?string $countryName = null): array
+        if (empty($this->positiveWords)) {
+            $this->positiveWords = [
+                'growth', 'increase', 'profit', 'stable', 'improve', 'surge',
+                'boost', 'recovery', 'expansion', 'gain', 'rise', 'success',
+                'opportunity', 'demand', 'strong', 'robust', 'advance', 'breakthrough',
+            ];
+        }
+        if (empty($this->negativeWords)) {
+            $this->negativeWords = [
+                'war', 'crisis', 'inflation', 'delay', 'disaster', 'strike',
+                'shortage', 'congestion', 'conflict', 'disruption', 'collapse',
+                'decline', 'recession', 'tariff', 'sanction', 'loss', 'risk',
+                'attack', 'blockage', 'halt', 'suspend', 'ban', 'threat',
+            ];
+        }
+    }
+
+    public function fetchNews(string $query = 'logistics shipping trade economy', ?string $countryName = null, bool $forceRefresh = false): array
     {
         $cacheKey = 'news_' . md5($query);
-        $cached   = NewsCache::where('cache_key', $cacheKey)->first();
+
+        if ($forceRefresh) {
+            NewsCache::where('cache_key', $cacheKey)->delete();
+        }
+
+        $cached = NewsCache::where('cache_key', $cacheKey)->first();
 
         if ($cached && $cached->cached_at->diffInMinutes(now()) < 60) {
+            $articles = is_string($cached->articles) ? json_decode($cached->articles, true) : $cached->articles;
+            $sentiment = $this->analyzeSentiment($articles);
             return [
-                'articles'     => $cached->articles,
-                'positive_pct' => $cached->positive_pct,
-                'neutral_pct'  => $cached->neutral_pct,
-                'negative_pct' => $cached->negative_pct,
+                'articles'     => $articles,
+                'positive_pct' => $sentiment['positive'],
+                'neutral_pct'  => $sentiment['neutral'],
+                'negative_pct' => $sentiment['negative'],
+                'pos_count'    => $sentiment['pos_count'],
+                'neg_count'    => $sentiment['neg_count'],
+                'sentiment'    => $sentiment['sentiment'],
                 'from_cache'   => true,
             ];
         }
@@ -71,6 +96,9 @@ class NewsService
             'positive_pct' => $sentiment['positive'],
             'neutral_pct'  => $sentiment['neutral'],
             'negative_pct' => $sentiment['negative'],
+            'pos_count'    => $sentiment['pos_count'],
+            'neg_count'    => $sentiment['neg_count'],
+            'sentiment'    => $sentiment['sentiment'],
             'from_cache'   => false,
         ];
     }
@@ -122,16 +150,30 @@ class NewsService
         }
 
         $sum = $pos + $neg;
-        if ($sum === 0) return ['positive' => 33.33, 'neutral' => 33.33, 'negative' => 33.33];
+        if ($sum === 0) {
+            return [
+                'positive'  => 33.33,
+                'neutral'   => 33.34,
+                'negative'  => 33.33,
+                'pos_count' => 0,
+                'neg_count' => 0,
+                'sentiment' => 'Neutral'
+            ];
+        }
 
         $posPercent = round(($pos / $sum) * 100, 2);
         $negPercent = round(($neg / $sum) * 100, 2);
         $neuPercent = round(100 - $posPercent - $negPercent, 2);
 
+        $sentiment = $pos > $neg ? 'Positive' : ($pos < $neg ? 'Negative' : 'Neutral');
+
         return [
-            'positive' => max(0, $posPercent),
-            'neutral'  => max(0, $neuPercent),
-            'negative' => max(0, $negPercent),
+            'positive'  => max(0, $posPercent),
+            'neutral'   => max(0, $neuPercent),
+            'negative'  => max(0, $negPercent),
+            'pos_count' => $pos,
+            'neg_count' => $neg,
+            'sentiment' => $sentiment,
         ];
     }
 

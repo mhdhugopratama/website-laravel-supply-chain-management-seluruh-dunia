@@ -38,7 +38,7 @@ class ApiController extends Controller
 
         $weatherData   = $this->weather->getWeather((float)$country->latitude, (float)$country->longitude);
         $economicData  = $this->worldBank->getEconomicData($country->iso2);
-        $newsData      = $this->news->fetchNews("logistics {$country->name}");
+        $newsData      = $this->news->fetchNews("logistics {$country->name}", $country->name);
 
         $weatherRisk   = $this->weather->weatherRiskScore($weatherData);
         $inflationRisk = $this->worldBank->inflationRiskScore($economicData['inflation']);
@@ -48,10 +48,32 @@ class ApiController extends Controller
         $risk = $this->riskEngine->calculate($weatherRisk, $inflationRisk, $newsRisk, $currencyRisk);
 
         return response()->json(array_merge($risk, [
-            'country'  => $country->name,
-            'weather'  => $weatherData,
-            'economic' => $economicData,
+            'country'   => $country->name,
+            'weather'   => $weatherData,
+            'economic'  => $economicData,
+            'sentiment' => [
+                'positive' => $newsData['positive_pct'],
+                'neutral'  => $newsData['neutral_pct'],
+                'negative' => $newsData['negative_pct'],
+            ],
         ]));
+    }
+
+    // New endpoint: returns sentiment percentages for a given country ISO3
+    public function sentiment(Request $request): JsonResponse
+    {
+        $iso3    = $request->input('iso3');
+        $country = Country::where('iso3', $iso3)->firstOrFail();
+        $newsData = $this->news->fetchNews("logistics {$country->name}", $country->name);
+
+        return response()->json([
+            'country'   => $country->name,
+            'sentiment' => [
+                'positive' => $newsData['positive_pct'],
+                'neutral'  => $newsData['neutral_pct'],
+                'negative' => $newsData['negative_pct'],
+            ],
+        ]);
     }
 
     public function ports(Request $request): JsonResponse
@@ -64,6 +86,8 @@ class ApiController extends Controller
             $query->where('name', 'like', "%{$request->search}%");
         }
         return response()->json($query->limit(500)->get());
+    }
+
     }
 
     public function news(Request $request): JsonResponse
