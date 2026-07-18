@@ -41,8 +41,9 @@ class CurrencyService
         ];
     }
 
-    public function currencyRiskScore(string $currencyCode): float
+    public function currencyRiskScore(?string $currencyCode): float
     {
+        if (empty($currencyCode)) return 35;
         $rates    = $this->getRates();
         $riskyCurrencies = ['VES', 'ZWL', 'SLL', 'IQD', 'SDG', 'SOS', 'MZN', 'GNF', 'HTG'];
         if (in_array($currencyCode, $riskyCurrencies)) return 80;
