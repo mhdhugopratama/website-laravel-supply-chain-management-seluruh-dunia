@@ -11,11 +11,20 @@ class WorldBankService
     {
         $cacheKey = "worldbank_{$iso2}";
         return Cache::remember($cacheKey, 3600 * 12, function () use ($iso2) {
-            $gdp  = $this->fetchIndicator($iso2, 'NY.GDP.MKTP.CD');
-            $infl = $this->fetchIndicator($iso2, 'FP.CPI.TOTL.ZG');
-            $pop  = $this->fetchIndicator($iso2, 'SP.POP.TOTL');
-            $exp  = $this->fetchIndicator($iso2, 'NE.EXP.GNFS.CD');
-            $imp  = $this->fetchIndicator($iso2, 'NE.IMP.GNFS.CD');
+            $gdp = $this->fetchIndicator($iso2, 'NY.GDP.MKTP.CD');
+            
+            // If the primary indicator (GDP) fails, don't waste 15 seconds timing out on the rest!
+            if (is_null($gdp)) {
+                $infl = null;
+                $pop  = null;
+                $exp  = null;
+                $imp  = null;
+            } else {
+                $infl = $this->fetchIndicator($iso2, 'FP.CPI.TOTL.ZG');
+                $pop  = $this->fetchIndicator($iso2, 'SP.POP.TOTL');
+                $exp  = $this->fetchIndicator($iso2, 'NE.EXP.GNFS.CD');
+                $imp  = $this->fetchIndicator($iso2, 'NE.IMP.GNFS.CD');
+            }
 
             // Realistic fallbacks for missing economic indicators
             $hash = crc32($iso2);

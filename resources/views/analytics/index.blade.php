@@ -62,34 +62,34 @@
 
         <div class="row g-4">
             <div class="col-12 col-md-6">
-                <div class="chart-wrapper nb-card">
+                <div class="chart-wrapper nb-card h-100 d-flex flex-column">
                     <div class="nb-card-header"><i class="bi bi-graph-up"></i> {{ __('app.analytics.risk_chart') }}</div>
-                    <div class="nb-card-body">
-                        <canvas id="riskChart" height="220"></canvas>
+                    <div class="nb-card-body flex-grow-1 d-flex align-items-center justify-content-center">
+                        <div style="width:100%"><canvas id="riskChart" height="220"></canvas></div>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-6">
-                <div class="chart-wrapper nb-card">
+                <div class="chart-wrapper nb-card h-100 d-flex flex-column">
                     <div class="nb-card-header"><i class="bi bi-pie-chart"></i> {{ __('app.analytics.pie_chart') }}</div>
-                    <div class="nb-card-body">
-                        <canvas id="riskPieChart" height="220"></canvas>
+                    <div class="nb-card-body flex-grow-1 d-flex align-items-center justify-content-center">
+                        <div style="width:100%"><canvas id="riskPieChart" height="220"></canvas></div>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-6">
-                <div class="chart-wrapper nb-card">
+                <div class="chart-wrapper nb-card h-100 d-flex flex-column">
                     <div class="nb-card-header"><i class="bi bi-thermometer"></i> {{ __('app.analytics.weather_chart') }}</div>
-                    <div class="nb-card-body">
-                        <canvas id="weatherChart" height="220"></canvas>
+                    <div class="nb-card-body flex-grow-1 d-flex align-items-center justify-content-center">
+                        <div style="width:100%"><canvas id="weatherChart" height="220"></canvas></div>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-6">
-                <div class="chart-wrapper nb-card">
+                <div class="chart-wrapper nb-card h-100 d-flex flex-column">
                     <div class="nb-card-header"><i class="bi bi-bank"></i> {{ __('app.analytics.econ_chart') }}</div>
-                    <div class="nb-card-body">
-                        <canvas id="econChart" height="220"></canvas>
+                    <div class="nb-card-body flex-grow-1 d-flex align-items-center justify-content-center">
+                        <div style="width:100%"><canvas id="econChart" height="220"></canvas></div>
                     </div>
                 </div>
             </div>

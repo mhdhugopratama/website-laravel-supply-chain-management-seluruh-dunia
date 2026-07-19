@@ -78,8 +78,16 @@ class DashboardController extends Controller
             $result = [];
             foreach ($validCountries as $i => $c) {
                 $w = $batchWeather[$i] ?? ['temperature' => 0, 'precipitation' => 0, 'wind_speed' => 0, 'weather_code' => 0];
+                
+                $flagEmoji = '';
+                if (!empty($c->iso2) && strlen($c->iso2) >= 2) {
+                    $flagEmoji = mb_chr(ord(strtoupper($c->iso2)[0]) - 65 + 127462, 'UTF-8') . mb_chr(ord(strtoupper($c->iso2)[1]) - 65 + 127462, 'UTF-8');
+                }
+
                 $result[] = [
                     'name'    => $c->name,
+                    'iso2'    => $c->iso2,
+                    'flag'    => $flagEmoji,
                     'country' => $c->iso3,
                     'lat'     => $c->latitude,
                     'lon'     => $c->longitude,
@@ -118,11 +126,16 @@ class DashboardController extends Controller
                 
                 $overallRisk = $this->riskEngine->calculate($weatherRisk, $inflationRisk, $newsRisk, $currencyRisk);
 
+                $flagEmoji = '';
+                if (!empty($c->iso2) && strlen($c->iso2) >= 2) {
+                    $flagEmoji = mb_chr(ord(strtoupper($c->iso2)[0]) - 65 + 127462, 'UTF-8') . mb_chr(ord(strtoupper($c->iso2)[1]) - 65 + 127462, 'UTF-8');
+                }
+
                 $riskData[] = [
                     'name'     => $c->name,
                     'iso2'     => $c->iso2,
                     'iso3'     => $c->iso3,
-                    'flag'     => $c->flag_emoji,
+                    'flag'     => $flagEmoji,
                     'lat'      => (float)$c->latitude,
                     'lon'      => (float)$c->longitude,
                     'region'   => $c->region,
@@ -165,8 +178,19 @@ class DashboardController extends Controller
                 ];
             })->toArray();
 
+        // Calculate extreme and stable weather cities
+        $processedWeather = collect($weatherCities)->map(function ($city) {
+            // Extreme score: distance from comfortable 22°C + risk from wind/precipitation
+            $tempExtremity = abs($city['temp'] - 22);
+            $city['extreme_score'] = ($tempExtremity * 2) + $city['risk'];
+            return $city;
+        });
+
+        $extremeWeatherCities = $processedWeather->sortByDesc('extreme_score')->take(12)->values()->all();
+        $stableWeatherCities  = $processedWeather->sortBy('extreme_score')->take(12)->values()->all();
+
         return view('dashboard.index', compact(
-            'countries', 'watchlist', 'ports', 'weatherCities', 'mapCountries', 'topRiskCountries', 'bottomRiskCountries', 'regionalCoverage'
+            'countries', 'watchlist', 'ports', 'weatherCities', 'extremeWeatherCities', 'stableWeatherCities', 'mapCountries', 'topRiskCountries', 'bottomRiskCountries', 'regionalCoverage'
         ));
     }
 

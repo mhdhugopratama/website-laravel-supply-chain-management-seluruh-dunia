@@ -190,48 +190,94 @@
 </div>
 
 {{-- ── LIVE WEATHER STRIP ───────────────────────────────────────────── --}}
-<div class="nb-card mb-4">
-    <div class="nb-card-header"><i class="bi bi-cloud-sun-fill" style="color:var(--secondary)"></i> {{ __('app.country.weather') }} — {{ __('app.dashboard.major_ports') }}</div>
-    <div class="nb-card-body">
-        <div class="row g-2">
-            @foreach($weatherCities as $city)
-            @php
-                $icon = match(true) {
-                    $city['code'] === 0         => '☀️',
-                    $city['code'] <= 3          => '⛅',
-                    $city['code'] <= 49         => '🌫️',
-                    $city['code'] <= 59         => '🌦️',
-                    $city['code'] <= 69         => '🌧️',
-                    $city['code'] <= 79         => '❄️',
-                    $city['code'] <= 82         => '🌧️',
-                    $city['code'] <= 86         => '🌨️',
-                    $city['code'] <= 99         => '⛈️',
-                    default                     => '🌡️',
-                };
-                $tempColor = match(true) {
-                    $city['temp'] < 10  => 'var(--teal)',
-                    $city['temp'] < 25  => 'var(--green)',
-                    $city['temp'] < 35  => 'var(--secondary)',
-                    default             => 'var(--red)',
-                };
-                $riskBadge = $city['risk'] < 30 ? 'success' : ($city['risk'] < 60 ? 'warning' : 'danger');
-            @endphp
-            <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                <div class="nb-card" style="padding:12px;text-align:center">
-                    <div style="font-size:1.6rem;line-height:1">{{ $icon }}</div>
-                    <div style="font-weight:700;font-size:0.80rem;margin-top:6px;color:var(--text-dark)">{{ $city['name'] }}</div>
-                    <div style="font-size:1.1rem;font-weight:800;color:{{ $tempColor }};margin:2px 0">{{ $city['temp'] }}°C</div>
-                    <div style="font-size:0.68rem;color:var(--text-muted)">{{ $city['label'] }}</div>
-                    <div class="mt-1">
-                        <span class="nb-badge nb-badge-{{ $riskBadge }}">Risk {{ round($city['risk']) }}</span>
+<div class="row g-3 mb-4">
+    {{-- Column 1: Extreme Weather --}}
+    <div class="col-12 col-lg-6">
+        <div class="nb-card h-100">
+            <div class="nb-card-header"><i class="bi bi-thermometer-high" style="color:var(--red)"></i> {{ __('Top 12 Negara Cuaca Ekstrim') }}</div>
+            <div class="nb-card-body">
+                <div class="row g-2">
+                    @foreach($extremeWeatherCities as $city)
+                    @php
+                        $icon = match(true) {
+                            $city['code'] === 0         => '☀️',
+                            $city['code'] <= 3          => '⛅',
+                            $city['code'] <= 49         => '🌫️',
+                            $city['code'] <= 59         => '🌦️',
+                            $city['code'] <= 69         => '🌧️',
+                            $city['code'] <= 79         => '❄️',
+                            $city['code'] <= 82         => '🌧️',
+                            $city['code'] <= 86         => '🌨️',
+                            $city['code'] <= 99         => '⛈️',
+                            default                     => '🌡️',
+                        };
+                        $tempColor = match(true) {
+                            $city['temp'] < 10  => 'var(--teal)',
+                            $city['temp'] < 25  => 'var(--green)',
+                            $city['temp'] < 35  => 'var(--secondary)',
+                            default             => 'var(--red)',
+                        };
+                        $riskBadge = $city['risk'] < 30 ? 'success' : ($city['risk'] < 60 ? 'warning' : 'danger');
+                    @endphp
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-4 col-xl-3">
+                        <div class="nb-card" style="padding:10px 5px;text-align:center;height:100%;">
+                            <div style="font-size:1.4rem;line-height:1">{{ $icon }}</div>
+                            <div style="font-weight:700;font-size:0.75rem;margin-top:6px;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="{{ $city['name'] }}"><img src="https://flagcdn.com/w20/{{ strtolower($city['iso2']) }}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:4px;"> {{ $city['name'] }}</div>
+                            <div style="font-size:1.1rem;font-weight:800;color:{{ $tempColor }};margin:2px 0">{{ $city['temp'] }}°C</div>
+                            <div style="font-size:0.62rem;color:var(--text-muted)">{{ $city['label'] }}</div>
+                            <div class="mt-1">
+                                <span class="nb-badge nb-badge-{{ $riskBadge }}" style="font-size:0.6rem">Risk {{ round($city['risk']) }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div style="font-size:0.65rem;color:var(--text-muted);margin-top:3px">
-                        💨 {{ $city['wind'] }} km/h
-                        @if($city['precip'] > 0) · 🌧 {{ $city['precip'] }}mm @endif
-                    </div>
+                    @endforeach
                 </div>
             </div>
-            @endforeach
+        </div>
+    </div>
+
+    {{-- Column 2: Stable Weather --}}
+    <div class="col-12 col-lg-6">
+        <div class="nb-card h-100">
+            <div class="nb-card-header"><i class="bi bi-thermometer-sun" style="color:var(--green)"></i> {{ __('Top 12 Negara Cuaca Stabil') }}</div>
+            <div class="nb-card-body">
+                <div class="row g-2">
+                    @foreach($stableWeatherCities as $city)
+                    @php
+                        $icon = match(true) {
+                            $city['code'] === 0         => '☀️',
+                            $city['code'] <= 3          => '⛅',
+                            $city['code'] <= 49         => '🌫️',
+                            $city['code'] <= 59         => '🌦️',
+                            $city['code'] <= 69         => '🌧️',
+                            $city['code'] <= 79         => '❄️',
+                            $city['code'] <= 82         => '🌧️',
+                            $city['code'] <= 86         => '🌨️',
+                            $city['code'] <= 99         => '⛈️',
+                            default                     => '🌡️',
+                        };
+                        $tempColor = match(true) {
+                            $city['temp'] < 10  => 'var(--teal)',
+                            $city['temp'] < 25  => 'var(--green)',
+                            $city['temp'] < 35  => 'var(--secondary)',
+                            default             => 'var(--red)',
+                        };
+                        $riskBadge = $city['risk'] < 30 ? 'success' : ($city['risk'] < 60 ? 'warning' : 'danger');
+                    @endphp
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-4 col-xl-3">
+                        <div class="nb-card" style="padding:10px 5px;text-align:center;height:100%;">
+                            <div style="font-size:1.4rem;line-height:1">{{ $icon }}</div>
+                            <div style="font-weight:700;font-size:0.75rem;margin-top:6px;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="{{ $city['name'] }}"><img src="https://flagcdn.com/w20/{{ strtolower($city['iso2']) }}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:4px;"> {{ $city['name'] }}</div>
+                            <div style="font-size:1.1rem;font-weight:800;color:{{ $tempColor }};margin:2px 0">{{ $city['temp'] }}°C</div>
+                            <div style="font-size:0.62rem;color:var(--text-muted)">{{ $city['label'] }}</div>
+                            <div class="mt-1">
+                                <span class="nb-badge nb-badge-{{ $riskBadge }}" style="font-size:0.6rem">Risk {{ round($city['risk']) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -451,7 +497,7 @@ function initRiskMap() {
         const radius = 7;
         const popup = `
             <div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:160px">
-                <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">${c.flag} ${c.name}</div>
+                <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px"><img src="https://flagcdn.com/w20/${c.iso2.toLowerCase()}.png" width="18" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:4px;"> ${c.name}</div>
                 <div style="font-size:0.78rem;color:#64748b;margin-bottom:6px">${c.region || ''}</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap">
                     <span style="background:${color}20;color:${color};padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700">
@@ -493,7 +539,7 @@ function initWeatherMap() {
         const color = tempColor(city.temp);
         const popup = `
             <div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:170px">
-                <div style="font-weight:700;font-size:0.9rem;margin-bottom:2px">${weatherIcon(city.code)} ${city.name}</div>
+                <div style="font-weight:700;font-size:0.9rem;margin-bottom:2px"><img src="https://flagcdn.com/w20/${city.iso2.toLowerCase()}.png" width="18" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:4px;"> ${weatherIcon(city.code)} ${city.name}</div>
                 <div style="font-size:0.74rem;color:#64748b;margin-bottom:8px">${city.country}</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
                     <div style="background:#f1f5f9;padding:5px 8px;border-radius:8px;text-align:center">
@@ -557,10 +603,19 @@ function initPortMap() {
     portsData.forEach(port => {
         if (!port.latitude || !port.longitude) return;
         const color = portColor(port.type);
+        let portIso2 = '';
+        if (port.country_code) {
+            const match = allCountries.find(c => c.iso3 === port.country_code);
+            if (match && match.iso2) portIso2 = match.iso2.toLowerCase();
+        }
+
         const popup = `
             <div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:150px">
                 <div style="font-weight:700;font-size:0.88rem;margin-bottom:3px">⚓ ${port.name}</div>
-                <div style="font-size:0.76rem;color:#64748b;margin-bottom:6px">${port.country_name || port.country_code || ''}</div>
+                <div style="font-size:0.76rem;color:#64748b;margin-bottom:6px">
+                    ${portIso2 ? `<img src="https://flagcdn.com/w20/${portIso2}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:4px;">` : ''} 
+                    ${port.country_name || port.country_code || ''}
+                </div>
                 ${port.un_locode ? `<span style="background:#f1f5f9;padding:2px 8px;border-radius:999px;font-size:0.70rem;font-weight:700;color:#475569">UN/LOCODE: ${port.un_locode}</span>` : ''}
                 ${port.type ? `<div style="margin-top:4px;font-size:0.72rem;color:${color};font-weight:600">${port.type}</div>` : ''}
             </div>`;
@@ -616,12 +671,12 @@ function resetRoute() {
 function handleRouteClick(c) {
     if (!originCountry) {
         originCountry = c;
-        const m = L.circleMarker([c.lat, c.lon], {radius: 8, fillColor: '#10b981', color: '#fff', weight: 2, fillOpacity: 1}).addTo(routeMap).bindPopup('Origin: ' + c.name).openPopup();
+        const m = L.circleMarker([c.lat, c.lon], {radius: 8, fillColor: '#10b981', color: '#fff', weight: 2, fillOpacity: 1}).addTo(routeMap).bindPopup(`Origin: <img src="https://flagcdn.com/w20/${(c.iso2 || '').toLowerCase()}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:4px;"> ${c.name}`).openPopup();
         routeMarkers.push(m);
         document.getElementById('routeStatusText').innerHTML = '{{ __("app.dashboard.step2") }}';
     } else if (!destCountry && c.iso3 !== originCountry.iso3) {
         destCountry = c;
-        const m = L.circleMarker([c.lat, c.lon], {radius: 8, fillColor: '#ef4444', color: '#fff', weight: 2, fillOpacity: 1}).addTo(routeMap).bindPopup('Destination: ' + c.name).openPopup();
+        const m = L.circleMarker([c.lat, c.lon], {radius: 8, fillColor: '#ef4444', color: '#fff', weight: 2, fillOpacity: 1}).addTo(routeMap).bindPopup(`Destination: <img src="https://flagcdn.com/w20/${(c.iso2 || '').toLowerCase()}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:4px;"> ${c.name}`).openPopup();
         routeMarkers.push(m);
         document.getElementById('routeStatusText').innerHTML = '<span class="text-success">{{ __("app.dashboard.route_analyzed") }} ' + originCountry.iso3 + ' ➔ ' + destCountry.iso3 + '</span>';
         drawRoute();
@@ -639,23 +694,40 @@ function drawRoute() {
     let riskLabel = totalRisk < 40 ? 'Safe Route' : (totalRisk < 70 ? 'Moderate Risk' : 'High Risk');
     let color = totalRisk < 40 ? '#10b981' : (totalRisk < 70 ? '#f59e0b' : '#ef4444');
 
-    const latlngs = [
-        [originCountry.lat, originCountry.lon],
-        [destCountry.lat, destCountry.lon]
-    ];
+    let latlngs = [];
+    const lat1 = originCountry.lat, lon1 = originCountry.lon;
+    const lat2 = destCountry.lat, lon2 = destCountry.lon;
+    const offsetX = lat2 - lat1, offsetY = lon2 - lon1;
+    const midX = lat1 + offsetX / 2, midY = lon1 + offsetY / 2;
+    const curveFactor = 0.2;
+    const cpX = midX + (offsetY * curveFactor);
+    const cpY = midY - (offsetX * curveFactor);
+    for (let t = 0; t <= 1; t += 0.05) {
+        latlngs.push([(1-t)*(1-t)*lat1 + 2*(1-t)*t*cpX + t*t*lat2, (1-t)*(1-t)*lon1 + 2*(1-t)*t*cpY + t*t*lon2]);
+    }
+    latlngs.push([lat2, lon2]);
+
     routePolyline = L.polyline(latlngs, {color: color, weight: 4, dashArray: '10, 10', opacity: 0.9}).addTo(routeMap);
     routeMap.fitBounds(routePolyline.getBounds(), { padding: [50, 50] });
 
+    const compareUrl = `/compare?a=${originCountry.iso3}&b=${destCountry.iso3}`;
+    
     const popupHTML = `
         <div style="font-family:'Plus Jakarta Sans',sans-serif; text-align:center;">
             <div style="font-weight:700; margin-bottom:5px">Route Analysis</div>
-            <div>${originCountry.flag} ${originCountry.iso3} ➔ ${destCountry.flag} ${destCountry.iso3}</div>
+            <div>
+                <img src="https://flagcdn.com/w20/${(originCountry.iso2 || '').toLowerCase()}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:2px;"> ${originCountry.iso3} ➔ 
+                <img src="https://flagcdn.com/w20/${(destCountry.iso2 || '').toLowerCase()}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:2px;"> ${destCountry.iso3}
+            </div>
             <div style="margin-top:10px;">
                 <span style="background:${color}; color:#fff; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:12px;">
                     Transit Risk: ${totalRisk}/100
                 </span>
             </div>
-            <div style="font-size:11px; margin-top:5px; color:#64748b;">${riskLabel}</div>
+            <div style="font-size:11px; margin-top:5px; color:#64748b; margin-bottom:12px;">${riskLabel}</div>
+            <a href="${compareUrl}" class="nb-btn nb-btn-primary" style="padding: 4px 10px; font-size: 0.75rem; text-decoration: none; color: #ffffff !important;">
+                <i class="bi bi-bar-chart-fill"></i> View Analytics
+            </a>
         </div>
     `;
     
