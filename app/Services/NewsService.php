@@ -14,7 +14,7 @@ class NewsService
 
     public function __construct()
     {
-        // Load lexicon from database tables; fallback to hardcoded defaults if tables are empty
+        // ambil kamus kata dari database, kalau kosong pakai bawaan dari kode
         $this->positiveWords = DB::table('positive_words')->pluck('word')->toArray();
         $this->negativeWords = DB::table('negative_words')->pluck('word')->toArray();
 
@@ -45,7 +45,7 @@ class NewsService
             if ($cached && $cached->cached_at->diffInMinutes(now()) < 120) {
                 $articles = is_string($cached->articles) ? json_decode($cached->articles, true) : $cached->articles;
                 
-                // Only use cache if it has real articles
+                // pake cache cuma kl artikelnya beneran ada, jgn yg fake
                 if (!empty($articles) && !str_starts_with($articles[0]['url'] ?? '', '#')) {
                     $sentiment = $this->analyzeSentiment($articles);
 
@@ -66,10 +66,10 @@ class NewsService
         $apiKey = config('services.gnews.key');
         $articles = [];
 
-        // Try original query
+        // coba cari pake keyword awal dulu
         $articles = $this->callGNews($query, $apiKey);
 
-        // Fallback queries for countries if primary returns empty
+        // kl yg awal zonk, pake keyword cadangan
         if (empty($articles) && $countryName) {
             $broadQuery = "{$countryName} (logistics OR trade OR shipping OR economy)";
             $articles = $this->callGNews($broadQuery, $apiKey);
@@ -79,7 +79,7 @@ class NewsService
             }
         }
 
-        // Fetch local admin articles and merge them at the top
+        // ambil berita buatan admin trus taruh paling atas ntar
         $localArticles = \App\Models\Article::where('status', 'published')->latest()->get()->map(function($a) {
             return [
                 'title'       => $a->title,
@@ -87,28 +87,28 @@ class NewsService
                 'url'         => $a->source_url ?? '#',
                 'source'      => 'Internal / Admin',
                 'published'   => $a->created_at->toISOString(),
-                'image'       => null, // Cover images can be handled here if added later
+                'image'       => null, // ntar thumbnail bisa diurus dimari kl niat
             ];
         })->toArray();
 
-        // Add local articles first, then API articles
+        // gabungin berita lokal dulu, baru deh berita api
         if (!empty($localArticles)) {
             $articles = array_merge($localArticles, $articles);
             $articles = collect($articles)->unique('title')->values()->toArray();
         }
 
-        // Cache the result if we got real articles
+        // simpen ke cache kl sukses nyomot berita aslinya
         if (!empty($articles)) {
             NewsCache::updateOrCreate(['cache_key' => $cacheKey], [
                 'articles' => $articles,
                 'cached_at' => now(),
             ]);
         } else {
-            // If API failed and we have no cache, we have to fetch the old cache if it exists
+            // kl api down trus cache kosong, yaudah comot cache yg lama aja kepaksa
             $cached = NewsCache::where('cache_key', $cacheKey)->first();
             if ($cached) {
                 $articles = is_string($cached->articles) ? json_decode($cached->articles, true) : $cached->articles;
-                // filter out fake articles
+                // buang aja berita karangan dr hasilnya
                 $articles = array_filter($articles, fn($a) => !str_starts_with($a['url'] ?? '', '#'));
             }
         }

@@ -36,7 +36,7 @@ class WeatherService
 
     public function getBatchWeather(array $coordinates): array
     {
-        // coordinates = [['lat'=>..., 'lon'=>...], ...]
+        // formatnya kira2 kyk gini: [['lat'=>..., 'lon'=>...], ...]
         $results = [];
         $chunks = array_chunk($coordinates, 50, true);
         
@@ -56,7 +56,7 @@ class WeatherService
 
                 if ($response->successful()) {
                     $data = $response->json();
-                    // If multiple coordinates are requested, open-meteo returns an array of responses
+                    // kl requestnya banyak, api bakal ngasih array
                     if (is_array($data) && isset($data[0]['current'])) {
                         $i = 0;
                         foreach ($chunk as $originalKey => $coord) {
@@ -70,7 +70,7 @@ class WeatherService
                             $i++;
                         }
                     } else if (isset($data['current'])) {
-                        // only 1 coordinate requested
+                        // ini kl cuma minta 1 tempat doang
                         $originalKey = array_key_first($chunk);
                         $current = $data['current'];
                         $results[$originalKey] = [
@@ -82,11 +82,11 @@ class WeatherService
                     }
                 }
             } catch (\Exception $e) {
-                // ignore
+                // cuekin aja yg ini
             }
         }
         
-        // Fill in missing with mock data if API blocked
+        // kasih data bohongan kl api nya lg ngambek atau kelimit
         foreach ($coordinates as $k => $v) {
             if (!isset($results[$k])) {
                 $results[$k] = $this->getMockWeather($v['lat'], $v['lon']);
@@ -99,29 +99,29 @@ class WeatherService
     private function getMockWeather(float $lat, float $lon): array
     {
         $hash = crc32(round($lat, 1) . round($lon, 1) . date('Y-m-d'));
-        // Simulate temp based on latitude (closer to equator = hotter)
+        // buat suhu perkiraan yang masuk akal (makin dekat khatulistiwa makin panas)
         $tempBase = 30 - (abs($lat) / 3);
         $temp = $tempBase + (($hash % 100) / 10 - 5);
         
-        // Random precipitation (0 to 15mm)
+        // buat angka curah hujan acak dari 0 sampai 15
         $precip = ($hash % 150) / 10;
-        if ($precip < 5) $precip = 0; // mostly no rain
+        if ($precip < 5) $precip = 0; // kalau angkanya sangat kecil, anggap saja tidak hujan
         
-        // Random wind
+        // buat angka kecepatan angin acak
         $wind = 5 + ($hash % 25);
         
-        // Weather code
+        // kode cuacanya
         $code = 0;
-        if ($precip > 10) $code = 65; // heavy rain
-        elseif ($precip > 0) $code = 61; // light rain
-        elseif (($hash % 10) > 6) $code = 3; // cloudy
+        if ($precip > 10) $code = 65; // deres nih
+        elseif ($precip > 0) $code = 61; // gerimis doang
+        elseif (($hash % 10) > 6) $code = 3; // mendung aja
 
         return [
             'temperature'  => round($temp, 1),
             'precipitation'=> round($precip, 1),
             'wind_speed'   => $wind,
             'weather_code' => $code,
-            'is_mock'      => true // mark as fallback
+            'is_mock'      => true // tandai kalau ini adalah data buatan sistem (bukan asli)
         ];
     }
 

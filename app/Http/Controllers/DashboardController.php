@@ -61,20 +61,20 @@ class DashboardController extends Controller
             ['name' => 'Moscow',     'lat' =>  55.75, 'lon' =>  37.62, 'country' => 'RUS'],
         ];
 
-        // Fetch weather for all countries with valid coordinates (replaces limited major cities list)
+        // ambil cuaca buat semua negara yg ada kordinatnya (biar ga kaku list kotanya)
         $weatherCities = Cache::remember('dashboard_weather_cities', 60, function () use ($countries) {
-            // Filter countries that have latitude and longitude
+            // pastiin negaranya punya lat long
             $validCountries = $countries->filter(function ($c) {
                 return $c->latitude && $c->longitude;
             });
-            // Prepare coordinates array preserving original index keys
+            // siapin kordinatnya, urutannya jgn sampe acak2an
             $coords = [];
             foreach ($validCountries as $i => $c) {
                 $coords[$i] = ['lat' => (float)$c->latitude, 'lon' => (float)$c->longitude];
             }
-            // Batch request weather for all coordinates
+            // tembak api cuaca sekalian borongan
             $batchWeather = $this->weather->getBatchWeather($coords);
-            // Build result array with weather data per country
+            // rapihin hasil cuacanya per negara
             $result = [];
             foreach ($validCountries as $i => $c) {
                 $w = $batchWeather[$i] ?? ['temperature' => 0, 'precipitation' => 0, 'wind_speed' => 0, 'weather_code' => 0];
@@ -116,7 +116,7 @@ class DashboardController extends Controller
         foreach ($allValidCountries as $i => $c) {
             $w = $batchWeather[$i] ?? ['temperature' => 0, 'precipitation' => 0, 'wind_speed' => 0, 'weather_code' => 0];
             
-            // Use Smart Caching: Match real data if already visited, otherwise fallback to hash
+            // trik cache: kl udh pernah diload kasih data asli, kl blm kasih data abal2 dulu
             $hash = crc32($c->iso3);
             
             $ecoCache = \Illuminate\Support\Facades\Cache::get('worldbank_eco_' . $c->iso2);
@@ -160,13 +160,13 @@ class DashboardController extends Controller
         }
         $mapCountries = $riskData;
 
-        // Top 10 highest risk countries
+        // 10 negara dengan risiko paling tinggi
         $topRiskCountries = collect($mapCountries)->sortByDesc('risk')->take(10)->values()->all();
 
-        // Top 10 lowest risk countries (most secure/stable)
+        // 10 negara yang paling aman dan stabil
         $bottomRiskCountries = collect($mapCountries)->sortBy('risk')->take(10)->values()->all();
 
-        // Calculate dynamic regional coverage
+        // hitung coverage region otomatis
         $regionalCoverage = Country::groupBy('region')
             ->selectRaw('region, count(*) as count')
             ->orderByDesc('count')
@@ -191,9 +191,9 @@ class DashboardController extends Controller
                 ];
             })->toArray();
 
-        // Calculate extreme and stable weather cities
+        // tentukan negara mana yang cuacanya ekstrim dan mana yang stabil
         $processedWeather = collect($weatherCities)->map(function ($city) {
-            // Extreme score: distance from comfortable 22°C + risk from wind/precipitation
+            // hitung parahnya cuaca: bedanya suhu dr 22C ditambah angin+hujan
             $tempExtremity = abs($city['temp'] - 22);
             $city['extreme_score'] = ($tempExtremity * 2) + $city['risk'];
             return $city;
@@ -211,7 +211,7 @@ class DashboardController extends Controller
     {
         $country      = Country::where('iso3', $iso3)->firstOrFail();
 
-        // Dynamic lazy-load/fill from REST Countries API if critical details are missing
+        // kalau ada info penting yang kosong, lengkapi datanya dari API negara luar
         if (empty($country->population) || empty($country->capital) || empty($country->languages) || $country->latitude == 0) {
             $restData = app(\App\Services\RestCountriesService::class)->getCountryData($iso3);
             if (!empty($restData)) {
@@ -275,7 +275,7 @@ class DashboardController extends Controller
 
     private function buildCountryData(Country $country): array
     {
-        // Dynamic lazy-load/fill from REST Countries API if critical details are missing
+        // kalau ada info penting yang kosong, lengkapi datanya dari API negara luar
         if (empty($country->population) || empty($country->capital) || empty($country->languages) || $country->latitude == 0) {
             $restData = app(\App\Services\RestCountriesService::class)->getCountryData($country->iso3);
             if (!empty($restData)) {
