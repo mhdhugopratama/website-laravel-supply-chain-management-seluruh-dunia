@@ -1,13 +1,13 @@
 @extends('layouts.app')
-@section('title', 'Login — SupplyChainIQ')
+@section('title', 'Login — GoSupply')
 
 @section('content')
 <div class="d-flex justify-content-center align-items-center" style="min-height:70vh;padding:2rem 1rem">
     <div style="width:100%;max-width:440px">
         <div class="nb-card">
-            <div class="nb-card-header text-center" style="font-size:1.2rem;padding:1.2rem">
-                <i class="bi bi-lock-fill"></i> Sign In to SupplyChainIQ
-            </div>
+                <div class="nb-card-header text-center pb-2">
+                    <i class="bi bi-lock-fill"></i> Sign In to GoSupply
+                </div>
             <div class="nb-card-body">
                 @if($errors->any())
                     <div class="nb-alert nb-alert-danger">{{ $errors->first() }}</div>

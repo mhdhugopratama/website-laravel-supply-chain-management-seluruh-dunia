@@ -33,7 +33,7 @@ return array (
     'track_globally' => 'Tracked Globally',
     'sea_ports_mapped' => 'Sea Ports Mapped',
     'weather_stations' => 'Weather Stations',
-    'live_readings' => 'Live Readings',
+    'live_readings' => 'Live Condition',
     'realtime_feed' => 'Real-time Feed',
     'global_maps' => 'Global Intelligence Maps',
     'data_updated' => 'Data updated every 30 min',
@@ -222,7 +222,7 @@ return array (
   ),
   'auth' => 
   array (
-    'login_title' => 'Sign In to SupplyChainIQ',
+    'login_title' => 'Sign In to GoSupply',
     'email' => 'Email Address',
     'password' => 'Password',
     'remember' => 'Remember me',

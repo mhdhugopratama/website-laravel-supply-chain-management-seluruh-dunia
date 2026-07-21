@@ -33,7 +33,7 @@ return array (
     'track_globally' => 'Terlacak Global',
     'sea_ports_mapped' => 'Pelabuhan Dipetakan',
     'weather_stations' => 'Stasiun Cuaca',
-    'live_readings' => 'Pembacaan Langsung',
+    'live_readings' => 'Live Condition',
     'realtime_feed' => 'Umpan Waktu Nyata',
     'global_maps' => 'Peta Intelijen Global',
     'data_updated' => 'Data diperbarui setiap 30 mnt',
@@ -222,7 +222,7 @@ return array (
   ),
   'auth' => 
   array (
-    'login_title' => 'Masuk ke SupplyChainIQ',
+    'login_title' => 'Masuk ke GoSupply',
     'email' => 'Alamat Email',
     'password' => 'Kata Sandi',
     'remember' => 'Ingat saya',

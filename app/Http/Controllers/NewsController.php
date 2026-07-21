@@ -11,9 +11,11 @@ class NewsController extends Controller
 
     public function index(Request $request)
     {
-        $query = $request->input('q', 'logistics shipping trade economy');
+        $query = $request->input('q'); // the view will get an empty string if not provided
+        $apiQuery = $query ?: 'logistics OR supply chain OR trade OR economy';
+        
         $forceRefresh = $request->has('refresh');
-        $data  = $this->news->fetchNews($query, null, $forceRefresh);
+        $data  = $this->news->fetchNews($apiQuery, null, $forceRefresh);
         return view('news.index', compact('data', 'query'));
     }
 }

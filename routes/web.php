@@ -20,9 +20,11 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/country/{iso3}', [DashboardController::class, 'country'])->name('country.show');
-Route::get('/compare', [DashboardController::class, 'compare'])->name('compare');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/country/{iso3}', [DashboardController::class, 'country'])->name('country.show');
+    Route::get('/compare', [DashboardController::class, 'compare'])->name('compare');
+});
 Route::get('/ports', [PortController::class, 'index'])->name('ports.index');
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/currency', [CurrencyController::class, 'index'])->name('currency.index');

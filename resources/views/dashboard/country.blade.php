@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $country->name . ' — SupplyChainIQ')
+@section('title', $country->name . ' - GoSupply')
 @section('meta_description', 'Supply chain risk intelligence for ' . $country->name)
 
 @push('styles')
@@ -18,7 +18,7 @@
                 @if(!empty($country->iso2))
                     <img src="https://flagcdn.com/h40/{{ strtolower($country->iso2) }}.png" height="30" alt="Flag" style="border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); vertical-align: middle; margin-right: 8px;">
                 @else
-                    <span style="font-size:2.2rem">🌐</span>
+                    <span style="font-size:2.2rem"><i class="bi bi-globe2"></i></span>
                 @endif
                 {{ $country->name }}
                 <span class="nb-badge nb-badge-info ms-2">{{ $country->iso3 }}</span>
@@ -42,7 +42,7 @@
 
 <div class="container-fluid px-4">
     <div class="row g-4">
-        <div class="col-12 col-lg-4">
+        <div class="col-12 col-lg-4 d-flex flex-column">
             <div class="nb-card mb-3">
                 <div class="nb-card-header"><i class="bi bi-shield-exclamation"></i> {{ __('app.risk.score') }}</div>
                 <div class="nb-card-body text-center">
@@ -76,16 +76,16 @@
                 </div>
             </div>
 
-            <div class="nb-card mb-3">
+            <div class="nb-card mb-3 flex-grow-1">
                 <div class="nb-card-header"><i class="bi bi-info-circle"></i> {{ __('app.country.profile') }}</div>
-                <div class="nb-card-body">
+                <div class="nb-card-body d-flex flex-column justify-content-center">
                     <table class="nb-table">
                         <tr><td><strong>{{ __('app.country.population') }}</strong></td><td>{{ $country->population ? number_format($country->population) : __('app.country.no_data') }}</td></tr>
-                        <tr><td><strong>{{ __('app.country.currency') }}</strong></td><td>{{ $country->currency_code }} {{ $country->currency_symbol }} — {{ $country->currency_name }}</td></tr>
+                        <tr><td><strong>{{ __('app.country.currency') }}</strong></td><td>{{ $country->currency_code }} {{ $country->currency_symbol }}{{ $country->currency_name ? ' (' . $country->currency_name . ')' : '' }}</td></tr>
                         <tr><td><strong>ISO2</strong></td><td>{{ $country->iso2 }}</td></tr>
                         <tr><td><strong>{{ __('app.country.region') }}</strong></td><td>{{ $country->region }}</td></tr>
                         <tr><td><strong>{{ __('app.country.subregion') }}</strong></td><td>{{ $country->subregion }}</td></tr>
-                        <tr><td><strong>{{ __('app.country.area') }}</strong></td><td>{{ $country->area ? number_format($country->area) : __('app.country.no_data') }}</td></tr>
+                        <tr><td><strong>{{ __('app.country.area') }}</strong></td><td>{{ $country->area !== null ? number_format($country->area, $country->area < 10 ? 2 : 0) : __('app.country.no_data') }}</td></tr>
                         <tr><td><strong>{{ __('app.country.languages') }}</strong></td><td>{{ $country->languages ?? __('app.country.no_data') }}</td></tr>
                     </table>
                 </div>
@@ -105,7 +105,7 @@
                                 <div class="weather-icon-large">
                                     @php
                                         $code = $weatherData['weather_code'] ?? 0;
-                                        echo $code >= 95 ? '⛈' : ($code >= 80 ? '🌧' : ($code >= 60 ? '🌦' : ($code >= 50 ? '🌫' : ($code >= 3 ? '⛅' : '☀️'))));
+                                        echo $code >= 95 ? '' : ($code >= 80 ? '' : ($code >= 60 ? '' : ($code >= 50 ? '' : ($code >= 3 ? '' : '️'))));
                                     @endphp
                                 </div>
                                 <div>
@@ -124,11 +124,11 @@
                                 </div>
                             </div>
                             @if($weatherData['wind_speed'] > 60)
-                                <div class="nb-badge nb-badge-danger mt-2">⚠ {{ __('app.country.storm_risk') }}</div>
+                                <div class="nb-badge nb-badge-danger mt-2"> {{ __('app.country.storm_risk') }}</div>
                             @elseif($weatherData['precipitation'] > 10)
-                                <div class="nb-badge nb-badge-warning mt-2">🌧 {{ __('app.country.heavy_rain') }}</div>
+                                <div class="nb-badge nb-badge-warning mt-2"> {{ __('app.country.heavy_rain') }}</div>
                             @else
-                                <div class="nb-badge nb-badge-success mt-2">✓ {{ __('app.country.normal') }}</div>
+                                <div class="nb-badge nb-badge-success mt-2"> {{ __('app.country.normal') }}</div>
                             @endif
                             @endif
                         </div>
@@ -251,7 +251,7 @@ if (windSpeed > 60 || weatherCode >= 95) markerColor = '#FF1744';
 else if (precip > 10 || weatherCode >= 80) markerColor = '#FFE500';
 
 const markerHtml = `<div style="width:36px;height:36px;background:${markerColor};border:3px solid #000;box-shadow:4px 4px 0 #000;display:flex;align-items:center;justify-content:center;font-size:1.1rem;border-radius:50%">
-    ${weatherCode >= 95 ? '⛈' : weatherCode >= 80 ? '🌧' : weatherCode >= 60 ? '🌦' : '☀️'}
+    ${weatherCode >= 95 ? '' : weatherCode >= 80 ? '' : weatherCode >= 60 ? '' : '️'}
 </div>`;
 
 const icon = L.divIcon({ html: markerHtml, className: '', iconSize: [36, 36], iconAnchor: [18, 18] });

@@ -10,11 +10,64 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @stack('styles')
     <style>
         @keyframes blinker {
             50% { opacity: 0; }
+        }
+        /* TomSelect UI Overrides to match nb-select */
+        .ts-wrapper.single .ts-control, .ts-wrapper .ts-control {
+            background: var(--card-bg) !important;
+            border: 1.5px solid var(--card-border) !important;
+            border-radius: var(--r-md) !important;
+            color: var(--text-dark) !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            padding: 8px 32px 8px 12px !important;
+            font-size: 0.88rem !important;
+            min-height: 40px !important;
+            box-shadow: none !important;
+        }
+        [data-bs-theme="dark"] .ts-wrapper.single .ts-control, [data-bs-theme="dark"] .ts-wrapper .ts-control {
+            background: rgba(255,255,255,0.05) !important;
+        }
+        .ts-wrapper.focus .ts-control {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+        }
+        .ts-control input {
+            color: var(--text-dark) !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 0.88rem !important;
+        }
+        .ts-dropdown {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+            border-radius: var(--r-md) !important;
+            color: var(--text-dark) !important;
+            box-shadow: var(--card-shadow-hover) !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            margin-top: 4px !important;
+            z-index: 9999 !important;
+            font-size: 0.88rem !important;
+        }
+        .ts-dropdown .option {
+            padding: 8px 12px !important;
+            color: var(--text-dark) !important;
+            transition: background 0.1s;
+        }
+        .ts-dropdown .option:hover, .ts-dropdown .option.active {
+            background-color: var(--bg) !important;
+            color: var(--text-dark) !important;
+        }
+
+        /* Fix Leaflet Popups for Dark Mode */
+        [data-bs-theme="dark"] .leaflet-popup-content-wrapper,
+        [data-bs-theme="dark"] .leaflet-popup-tip {
+            background: var(--card-bg) !important;
+            color: var(--text-dark) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
         }
     </style>
 </head>
@@ -25,9 +78,8 @@
     <aside class="app-sidebar" id="appSidebar">
         <div class="sidebar-brand">
             <a href="{{ route('dashboard') }}" class="sb-brand-link">
-                <div class="sb-brand-icon">⛓</div>
                 <div class="sb-brand-text">
-                    <span class="sb-name">SupplyChain</span><span class="sb-accent">IQ</span>
+                    <span class="sb-name">Go</span><span class="sb-accent">Supply</span>
                 </div>
             </a>
             <button class="sb-collapse-btn" id="sidebarToggle" onclick="toggleSidebar()" title="Collapse">
@@ -60,7 +112,10 @@
             <a href="{{ route('ports.index') }}"
                title="{{ __('app.nav.ports') }}"
                class="sb-link {{ request()->routeIs('ports.*') ? 'active' : '' }}">
-                <i class="bi bi-anchor"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                  <path d="M7.5 11.5a.5.5 0 0 0 1 0v-4h-1v4z"/>
+                  <path d="M8 0a.5.5 0 0 0-.5.5v1.077c-1.396.195-2.5 1.4-2.5 2.923a3 3 0 0 0 2.5 2.923V9h-3V7.5a.5.5 0 0 0-1 0v3.5a1.5 1.5 0 0 0 1.5 1.5h2.5v1.577C5.104 14.2 3 12.33 3 10a.5.5 0 0 0-1 0c0 3 2.686 5.5 6 5.5s6-2.5 6-5.5a.5.5 0 0 0-1 0c0 2.33-2.104 4.2-4.5 4.077V12.5h2.5A1.5 1.5 0 0 0 12 11V7.5a.5.5 0 0 0-1 0V9h-3V7.423A3 3 0 0 0 10.5 4.5c0-1.523-1.104-2.728-2.5-2.923V.5A.5.5 0 0 0 8 0zm0 2.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
+                </svg>
                 <span>{{ __('app.nav.ports') }}</span>
             </a>
             <a href="{{ route('news.index') }}"
@@ -150,13 +205,7 @@
                 <span style="width:6px; height:6px; background:#fff; border-radius:50%; display:inline-block; animation: blinker 1s linear infinite;"></span> LIVE SIGNAL
             </span>
             <marquee scrollamount="4" style="flex: 1;" onmouseover="this.stop();" onmouseout="this.start();">
-                🚢 Weather at Port of Shanghai: Clear Sky, Temp 26.8°C, Wind 12km/h · 
-                📈 EUR to USD exchange rate is stable at 1.0854 · 
-                ⚠️ Logistics Sentiment Alert: Port of Rotterdam labor negotiations undergoing minor delays · 
-                🌾 Trade Watch: Global grain transit times increased by 4.2% due to seasonal delays · 
-                💨 Port of Singapore: Partly Cloudy, Temp 24.0°C, Wind 18km/h ·
-                🔄 Exchange Rate Feed: GBP to USD trading at 1.2942, JPY to USD at 0.0064 ·
-                🏗️ Supply Chain Index: Current global congestion risk score is 34.5 (Low-Medium)
+                 {!! $liveSignals ?? 'Loading live signals...' !!}
             </marquee>
         </div>
 
@@ -176,8 +225,7 @@
         </main>
 
         <footer class="app-footer">
-            <span>© {{ date('Y') }} <strong>SupplyChainIQ</strong> — {{ __('app.footer') }}</span>
-            <span>{{ __('app.footer_powered') }}</span>
+            <span>&copy; {{ date('Y') }} <strong>GoSupply</strong> {{ __('app.footer') }}</span>
         </footer>
     </div>
 </div>
@@ -258,5 +306,31 @@ document.addEventListener('click', function(e) {
 @if(request()->routeIs('ports.*') || request()->routeIs('analytics.*'))
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 @endif
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.nb-select-country').forEach(function(el) {
+            new TomSelect(el, {
+                create: false,
+                dropdownParent: "body",
+                sortField: { field: "text", direction: "asc" },
+                render: {
+                    option: function(data, escape) {
+                        return '<div class="d-flex align-items-center">' +
+                            (data.src ? '<img src="' + data.src + '" width="20" style="margin-right: 8px; border-radius: 2px;">' : '') +
+                            '<span>' + escape(data.text) + '</span>' +
+                            '</div>';
+                    },
+                    item: function(data, escape) {
+                        return '<div class="d-flex align-items-center">' +
+                            (data.src ? '<img src="' + data.src + '" width="20" style="margin-right: 8px; border-radius: 2px;">' : '') +
+                            '<span>' + escape(data.text) + '</span>' +
+                            '</div>';
+                    }
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

@@ -10,4 +10,9 @@ class Port extends Model
         'name', 'country_code', 'country_name',
         'latitude', 'longitude', 'un_locode', 'type',
     ];
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_code', 'iso3');
+    }
 }

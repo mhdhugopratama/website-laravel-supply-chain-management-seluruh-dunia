@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __('app.watchlist.title') . ' — SupplyChainIQ')
+@section('title', __('app.watchlist.title') . ' — GoSupply')
 
 @section('content')
 <div class="nb-page-header">
@@ -30,7 +30,7 @@
                             @if(!empty($country->iso2))
                                 <img src="https://flagcdn.com/w80/{{ strtolower($country->iso2) }}.png" width="48" alt="Flag" style="border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.25);">
                             @else
-                                <span style="font-size:2.5rem">🌐</span>
+                                <span style="font-size:2.5rem"><i class="bi bi-globe2"></i></span>
                             @endif
                         </div>
                         <div class="flex-fill">

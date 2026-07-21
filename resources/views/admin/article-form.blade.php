@@ -31,6 +31,10 @@
                     <textarea name="excerpt" class="nb-input mt-1" rows="2" style="resize:vertical">{{ old('excerpt', $article->excerpt ?? '') }}</textarea>
                 </div>
                 <div class="mb-3">
+                    <label style="font-weight:700;font-size:0.85rem">Source URL (Link to original article)</label>
+                    <input type="url" name="source_url" class="nb-input mt-1" value="{{ old('source_url', $article->source_url ?? '') }}" placeholder="https://example.com/article">
+                </div>
+                <div class="mb-3">
                     <label style="font-weight:700;font-size:0.85rem">Body Content *</label>
                     <textarea name="body" class="nb-input mt-1" rows="12" style="resize:vertical;font-family:monospace" required>{{ old('body', $article->body ?? '') }}</textarea>
                 </div>

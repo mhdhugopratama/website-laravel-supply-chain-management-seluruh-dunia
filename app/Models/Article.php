@@ -8,7 +8,7 @@ class Article extends Model
 {
     protected $fillable = [
         'user_id', 'title', 'slug', 'excerpt',
-        'body', 'cover_image', 'status',
+        'source_url', 'body', 'cover_image', 'status',
     ];
 
     public function author()

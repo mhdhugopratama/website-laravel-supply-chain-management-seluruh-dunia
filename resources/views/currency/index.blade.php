@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __('app.currency.title') . ' — SupplyChainIQ')
+@section('title', __('app.currency.title') . ' — GoSupply')
 @section('meta_description', 'Real-time currency exchange rates and cross-currency converter for global trade.')
 
 @section('content')
@@ -12,7 +12,7 @@
 
 <div class="container-fluid px-4">
     <div class="row g-4">
-        <div class="col-12 col-lg-5">
+        <div class="col-12 col-lg-5 d-flex flex-column">
             <div class="nb-card mb-3">
                 <div class="nb-card-header"><i class="bi bi-arrow-left-right"></i> {{ __('app.currency.converter') }}</div>
                 <div class="nb-card-body">
@@ -23,7 +23,7 @@
                     <div class="row g-2 mb-3">
                         <div class="col-6">
                             <label style="font-weight:700;font-size:0.82rem">{{ __('app.currency.from') }}</label>
-                            <select id="convFrom" class="nb-select mt-1">
+                            <select id="convFrom" class="nb-select mt-1 nb-select-country">
                                 @foreach($rates as $code => $rate)
                                     <option value="{{ $code }}" {{ $code === 'USD' ? 'selected' : '' }}>{{ $code }}</option>
                                 @endforeach
@@ -31,7 +31,7 @@
                         </div>
                         <div class="col-6">
                             <label style="font-weight:700;font-size:0.82rem">{{ __('app.currency.to') }}</label>
-                            <select id="convTo" class="nb-select mt-1">
+                            <select id="convTo" class="nb-select mt-1 nb-select-country">
                                 @foreach($rates as $code => $rate)
                                     <option value="{{ $code }}" {{ $code === 'EUR' ? 'selected' : '' }}>{{ $code }}</option>
                                 @endforeach
@@ -52,22 +52,22 @@
                 </div>
             </div>
 
-            <div class="nb-card">
+            <div class="nb-card flex-grow-1 d-flex flex-column">
                 <div class="nb-card-header"><i class="bi bi-graph-up-arrow"></i> {{ __('app.currency.trend_chart') }}</div>
-                <div class="nb-card-body">
-                    <div class="chart-wrapper">
-                        <canvas id="rateChart" height="200"></canvas>
+                <div class="nb-card-body d-flex flex-column">
+                    <div class="chart-wrapper flex-grow-1" style="min-height: 200px;">
+                        <canvas id="rateChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-lg-7">
-            <div class="nb-card">
+        <div class="col-12 col-lg-7 d-flex flex-column">
+            <div class="nb-card h-100 d-flex flex-column">
                 <div class="nb-card-header"><i class="bi bi-table"></i> {{ __('app.currency.rates_table') }}</div>
-                <div class="nb-card-body">
+                <div class="nb-card-body d-flex flex-column">
                     <input type="text" id="rateSearch" class="nb-input mb-3" placeholder="{{ __('app.currency.filter') }}">
-                    <div style="max-height:600px;overflow-y:auto">
+                    <div class="flex-grow-1" style="overflow-y:auto; min-height: 400px; max-height: 600px;">
                         <table class="nb-table" id="rateTable">
                             <thead>
                                 <tr>

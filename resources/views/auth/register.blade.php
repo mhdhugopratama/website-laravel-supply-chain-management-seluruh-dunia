@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Register — SupplyChainIQ')
+@section('title', 'Register — GoSupply')
 
 @section('content')
 <div class="d-flex justify-content-center align-items-center" style="min-height:70vh;padding:2rem 1rem">

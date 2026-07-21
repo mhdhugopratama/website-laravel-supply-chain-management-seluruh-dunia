@@ -80,10 +80,11 @@ class AdminController extends Controller
     public function storeArticle(Request $request)
     {
         $data = $request->validate([
-            'title'   => 'required|string|max:255',
-            'excerpt' => 'nullable|string',
-            'body'    => 'required|string',
-            'status'  => 'required|in:draft,published',
+            'title'      => 'required|string|max:255',
+            'excerpt'    => 'nullable|string',
+            'source_url' => 'nullable|url',
+            'body'       => 'required|string',
+            'status'     => 'required|in:draft,published',
         ]);
 
         Article::create(array_merge($data, [
@@ -102,10 +103,11 @@ class AdminController extends Controller
     public function updateArticle(Request $request, Article $article)
     {
         $data = $request->validate([
-            'title'   => 'required|string|max:255',
-            'excerpt' => 'nullable|string',
-            'body'    => 'required|string',
-            'status'  => 'required|in:draft,published',
+            'title'      => 'required|string|max:255',
+            'excerpt'    => 'nullable|string',
+            'source_url' => 'nullable|url',
+            'body'       => 'required|string',
+            'status'     => 'required|in:draft,published',
         ]);
 
         $article->update($data);

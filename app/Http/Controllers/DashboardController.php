@@ -62,7 +62,7 @@ class DashboardController extends Controller
         ];
 
         // Fetch weather for all countries with valid coordinates (replaces limited major cities list)
-        $weatherCities = Cache::remember('dashboard_weather_cities', 1800, function () use ($countries) {
+        $weatherCities = Cache::remember('dashboard_weather_cities', 60, function () use ($countries) {
             // Filter countries that have latitude and longitude
             $validCountries = $countries->filter(function ($c) {
                 return $c->latitude && $c->longitude;
@@ -212,7 +212,7 @@ class DashboardController extends Controller
                     'currency_code'   => $restData['currency_code'] ?? $country->currency_code,
                     'currency_name'   => $restData['currency_name'] ?? $country->currency_name,
                     'currency_symbol' => $restData['currency_symbol'] ?? $country->currency_symbol,
-                ]));
+                ], fn($val) => !is_null($val)));
             }
         }
 
@@ -276,7 +276,7 @@ class DashboardController extends Controller
                     'currency_code'   => $restData['currency_code'] ?? $country->currency_code,
                     'currency_name'   => $restData['currency_name'] ?? $country->currency_name,
                     'currency_symbol' => $restData['currency_symbol'] ?? $country->currency_symbol,
-                ]));
+                ], fn($val) => !is_null($val)));
             }
         }
 
@@ -288,12 +288,14 @@ class DashboardController extends Controller
         $newsRisk      = $this->news->newsRiskScore($newsData['negative_pct']);
         $currencyRisk  = $this->currency->currencyRiskScore($country->currency_code);
         $risk          = $this->riskEngine->calculate($weatherRisk, $inflationRisk, $newsRisk, $currencyRisk);
+        $rates         = $this->currency->getRates();
 
         return [
             'weather'  => $weatherData,
             'economic' => $economicData,
             'news'     => $newsData,
             'risk'     => $risk,
+            'exchange' => $rates[$country->currency_code] ?? null,
         ];
     }
 }

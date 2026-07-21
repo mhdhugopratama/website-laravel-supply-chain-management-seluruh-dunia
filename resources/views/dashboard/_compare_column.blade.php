@@ -7,11 +7,11 @@
     </div>
     <span class="nb-badge nb-badge-{{ $data['risk']['level']['badge'] }}" style="font-size: 0.85rem; padding: 6px 16px;">
         @if($data['risk']['level']['badge'] === 'success')
-            🛡️ {{ __('app.risk.low') }}
+            ️ {{ __('app.risk.low') }}
         @elseif($data['risk']['level']['badge'] === 'warning')
-            ⚠️ {{ __('app.risk.medium') }}
+            ️ {{ __('app.risk.medium') }}
         @else
-            🚨 {{ __('app.risk.high') }}
+             {{ __('app.risk.high') }}
         @endif
     </span>
 </div>

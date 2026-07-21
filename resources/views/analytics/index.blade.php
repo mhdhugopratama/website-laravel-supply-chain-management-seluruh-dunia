@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __('app.analytics.title') . ' — SupplyChainIQ')
+@section('title', __('app.analytics.title') . ' — GoSupply')
 @section('meta_description', 'Interactive analytics with GDP, inflation, currency, and risk trend charts for any country.')
 
 @section('content')
@@ -12,25 +12,25 @@
 
 <div class="container-fluid px-4">
     <div class="nb-card mb-4">
-        <div class="nb-card-body d-flex gap-3 align-items-center flex-wrap">
-            <label style="font-weight:700;font-size:0.85rem;white-space:nowrap">{{ __('app.analytics.select') }}</label>
-            <select id="analyticsCountry" class="nb-select" style="max-width:350px">
-                <option value="">{{ __('app.analytics.placeholder') }}</option>
-                @foreach($countries as $c)
-                    @php
-                        $flagEmoji = '';
-                        if (!empty($c->iso2)) {
-                            $chr1 = ord(strtoupper($c->iso2)[0]) - 65 + 127462;
-                            $chr2 = ord(strtoupper($c->iso2)[1]) - 65 + 127462;
-                            $flagEmoji = mb_chr($chr1, 'UTF-8') . mb_chr($chr2, 'UTF-8') . ' ';
-                        }
-                    @endphp
-                    <option value="{{ $c->iso3 }}">{{ $flagEmoji }}{{ $c->name }} ({{ $c->iso3 }})</option>
-                @endforeach
-            </select>
-            <button class="nb-btn nb-btn-primary" onclick="loadAnalytics()">
-                <i class="bi bi-graph-up-arrow"></i> {{ __('app.analytics.btn_load') }}
-            </button>
+        <div class="nb-card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-9">
+                    <label style="font-weight:700;font-size:0.85rem;display:block;margin-bottom:8px;">{{ __('app.analytics.select') }}</label>
+                    <select id="analyticsCountry" class="nb-select nb-select-country w-100">
+                        <option value="">{{ __('app.analytics.placeholder') }}</option>
+                        @foreach($countries as $c)
+                            <option value="{{ $c->iso3 }}" data-src="{{ !empty($c->iso2) ? 'https://flagcdn.com/w20/'.strtolower($c->iso2).'.png' : '' }}">
+                                {{ $c->name }} ({{ $c->iso3 }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <button class="nb-btn nb-btn-primary w-100" onclick="loadAnalytics()">
+                        <i class="bi bi-graph-up-arrow"></i> {{ __('app.analytics.btn_load') }}
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -49,7 +49,7 @@
             <div class="nb-card-body">
                 <div class="row g-3">
                     <div class="col-12 col-md-4" style="border-right: 1px solid var(--card-border);">
-                        <h6 style="font-weight: 800; color: var(--text-dark); margin-bottom: 8px;">📢 Threat Vulnerability Verdict</h6>
+                        <h6 style="font-weight: 800; color: var(--text-dark); margin-bottom: 8px;"> Threat Vulnerability Verdict</h6>
                         <div id="verdictText" style="font-size: 0.88rem; line-height: 1.6; margin-top: 10px; color: var(--text-body);"></div>
                     </div>
                     <div class="col-12 col-md-8">
@@ -159,50 +159,50 @@ function loadAnalytics() {
             else badgeLabel = "{{ __('app.risk.high') }}";
 
             document.getElementById('analyticsStats').innerHTML = `
-                <div class="col-6 col-md-3"><div class="nb-admin-stat">
+                <div class="col-6 col-md-3"><div class="nb-admin-stat h-100">
                     <div class="nb-stat-label">{{ __('app.risk.score') }}</div>
                     <div class="nb-admin-stat-number" style="color:${r.level.color}">${Math.round(r.score)}%</div>
                     <div class="nb-badge nb-badge-${r.level.badge}">${badgeLabel}</div>
                 </div></div>
-                <div class="col-6 col-md-3"><div class="nb-admin-stat">
-                    <div class="nb-stat-label">🌡️ {{ __('app.country.temperature') }}</div>
+                <div class="col-6 col-md-3"><div class="nb-admin-stat h-100">
+                    <div class="nb-stat-label">️ {{ __('app.country.temperature') }}</div>
                     <div class="nb-admin-stat-number" style="color:var(--nb-cyan)">${w.temperature ?? 'N/A'}°C</div>
-                    <div style="font-size:0.68rem;color:var(--text-muted)">💨 Wind: ${w.wind_speed ?? 'N/A'} km/h</div>
+                    <div style="font-size:0.68rem;color:var(--text-muted)"> Wind: ${w.wind_speed ?? 'N/A'} km/h</div>
                 </div></div>
-                <div class="col-6 col-md-3"><div class="nb-admin-stat">
-                    <div class="nb-stat-label">💰 {{ __('app.country.gdp') }}</div>
+                <div class="col-6 col-md-3"><div class="nb-admin-stat h-100">
+                    <div class="nb-stat-label"> {{ __('app.country.gdp') }}</div>
                     <div class="nb-admin-stat-number" style="color:var(--nb-green)">
                         ${e.gdp ? '$' + (e.gdp / 1e9).toFixed(1) + 'B' : 'N/A'}
                     </div>
                     <div style="font-size:0.68rem;color:var(--text-muted)">Annual GDP</div>
                 </div></div>
-                <div class="col-6 col-md-3"><div class="nb-admin-stat">
-                    <div class="nb-stat-label">📈 {{ __('app.country.inflation') }}</div>
+                <div class="col-6 col-md-3"><div class="nb-admin-stat h-100">
+                    <div class="nb-stat-label"> {{ __('app.country.inflation') }}</div>
                     <div class="nb-admin-stat-number" style="color:${(e.inflation||0)>10?'var(--nb-red)':'var(--nb-orange)'}">
                         ${e.inflation !== null ? e.inflation.toFixed(2) + '%' : 'N/A'}
                     </div>
-                    <div style="font-size:0.68rem;color:var(--text-muted)">${(e.inflation||0) > 8 ? '⚠️ High inflation risk' : '✅ Manageable rate'}</div>
+                    <div style="font-size:0.68rem;color:var(--text-muted)">${(e.inflation||0) > 8 ? '️ High inflation risk' : ' Manageable rate'}</div>
                 </div></div>
-                <div class="col-6 col-md-3"><div class="nb-admin-stat">
-                    <div class="nb-stat-label">📦 Exports</div>
+                <div class="col-6 col-md-3"><div class="nb-admin-stat h-100">
+                    <div class="nb-stat-label"> Exports</div>
                     <div class="nb-admin-stat-number" style="color:var(--nb-purple)">
                         ${e.exports ? '$' + (e.exports / 1e9).toFixed(1) + 'B' : 'N/A'}
                     </div>
                 </div></div>
-                <div class="col-6 col-md-3"><div class="nb-admin-stat">
-                    <div class="nb-stat-label">📥 Imports</div>
+                <div class="col-6 col-md-3"><div class="nb-admin-stat h-100">
+                    <div class="nb-stat-label"> Imports</div>
                     <div class="nb-admin-stat-number" style="color:var(--nb-pink)">
                         ${e.imports ? '$' + (e.imports / 1e9).toFixed(1) + 'B' : 'N/A'}
                     </div>
                 </div></div>
-                <div class="col-6 col-md-3"><div class="nb-admin-stat">
-                    <div class="nb-stat-label">👥 Population</div>
+                <div class="col-6 col-md-3"><div class="nb-admin-stat h-100">
+                    <div class="nb-stat-label"> Population</div>
                     <div class="nb-admin-stat-number" style="color:var(--primary)">
                         ${c.population ? Number(c.population).toLocaleString() : 'N/A'}
                     </div>
                 </div></div>
-                <div class="col-6 col-md-3"><div class="nb-admin-stat">
-                    <div class="nb-stat-label">💱 Currency</div>
+                <div class="col-6 col-md-3"><div class="nb-admin-stat h-100">
+                    <div class="nb-stat-label"> Currency</div>
                     <div class="nb-admin-stat-number" style="color:var(--nb-orange)">
                         ${c.currency_code || 'N/A'}
                     </div>

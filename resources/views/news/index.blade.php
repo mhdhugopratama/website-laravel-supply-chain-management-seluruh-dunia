@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __('app.news.title') . ' — SupplyChainIQ')
+@section('title', __('app.news.title') . ' — GoSupply')
 @section('meta_description', 'Real-time logistics, trade, and shipping intelligence with lexicon-based sentiment analysis.')
 
 @section('content')
@@ -27,32 +27,32 @@
     <!-- LIVE STATS ROW -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
-            <div class="nb-card text-center" style="padding: 16px;">
+            <div class="nb-card text-center" style="padding: 24px;">
                 <div style="font-size:0.70rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;"><i class="bi bi-newspaper" style="color:var(--primary)"></i> Total Articles</div>
                 <div style="font-size:2rem; font-weight:900; color:var(--text-dark); margin-top:4px;">{{ count($data['articles']) }}</div>
                 <div style="font-size:0.70rem; color:var(--text-muted);">Fetched in real-time</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="nb-card text-center" style="padding: 16px;">
+            <div class="nb-card text-center" style="padding: 24px;">
                 <div style="font-size:0.70rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;"><i class="bi bi-emoji-smile" style="color:var(--nb-green)"></i> Positive Words</div>
                 <div style="font-size:2rem; font-weight:900; color:var(--nb-green); margin-top:4px;">{{ $data['pos_count'] ?? 0 }}</div>
                 <div style="font-size:0.70rem; color:var(--text-muted);">Detected via lexicon</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="nb-card text-center" style="padding: 16px;">
+            <div class="nb-card text-center" style="padding: 24px;">
                 <div style="font-size:0.70rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;"><i class="bi bi-emoji-frown" style="color:var(--nb-red)"></i> Negative Words</div>
                 <div style="font-size:2rem; font-weight:900; color:var(--nb-red); margin-top:4px;">{{ $data['neg_count'] ?? 0 }}</div>
                 <div style="font-size:0.70rem; color:var(--text-muted);">Risk-related keywords</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="nb-card text-center" style="padding: 16px;">
+            <div class="nb-card text-center" style="padding: 24px;">
                 <div style="font-size:0.70rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;"><i class="bi bi-shield-fill-check" style="color:var(--primary)"></i> Overall Sentiment</div>
                 @php
                     $sentColor = ($data['sentiment'] ?? 'Neutral') === 'Positive' ? 'var(--nb-green)' : (($data['sentiment'] ?? 'Neutral') === 'Negative' ? 'var(--nb-red)' : 'var(--nb-orange)');
-                    $sentIcon = ($data['sentiment'] ?? 'Neutral') === 'Positive' ? '📈' : (($data['sentiment'] ?? 'Neutral') === 'Negative' ? '📉' : '📊');
+                    $sentIcon = ($data['sentiment'] ?? 'Neutral') === 'Positive' ? '' : (($data['sentiment'] ?? 'Neutral') === 'Negative' ? '' : '');
                 @endphp
                 <div style="font-size:1.5rem; font-weight:900; color:{{ $sentColor }}; margin-top:4px;">{{ $sentIcon }} {{ $data['sentiment'] ?? 'Neutral' }}</div>
                 <div style="font-size:0.70rem; color:var(--text-muted);">Market outlook</div>
@@ -67,14 +67,14 @@
             <div class="nb-card h-100">
                 <div class="nb-card-header"><i class="bi bi-funnel-fill" style="color:var(--primary)"></i> {{ __('app.news.intel_filters') }}</div>
                 <div class="nb-card-body">
-                    <form method="GET" action="{{ route('news.index') }}">
+                    <form method="GET" action="{{ route('news.index') }}" class="d-flex flex-column justify-content-center h-100" style="min-height: 120px;">
                         <div class="d-flex gap-2 mb-3">
                             <input type="text" name="q" class="nb-select" style="flex:1;"
                                 placeholder="{{ __('app.news.search_placeholder') }}" value="{{ $query }}">
                             <button type="submit" class="nb-btn nb-btn-primary">{{ __('app.news.analyze_btn') }}</button>
                         </div>
-                        <div class="d-flex flex-wrap gap-2">
-                            <span style="color:var(--text-muted); font-size:0.78rem; font-weight:600; margin-top:3px;">{{ __('app.news.categories') }}</span>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <span style="color:var(--text-muted); font-size:0.78rem; font-weight:600;">{{ __('app.news.categories') }}</span>
                             @foreach([
                                 'Logistics' => 'logistics', 
                                 'Trade'     => 'trade', 
@@ -133,7 +133,7 @@
 
                     <!-- Sentiment Verdict -->
                     <div style="background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); margin-top: 14px;">
-                        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">💡 Sentiment Insight</div>
+                        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;"> Sentiment Insight</div>
                         <span style="font-size: 0.82rem; color: var(--text-dark); line-height: 1.5;">
                             @if(($data['sentiment'] ?? 'Neutral') === 'Positive')
                                 Overall market outlook is <strong>positive</strong>. News reports indicate growth, expansion, and stability in global logistics channels. Supply chain operators can expect smooth operations.
@@ -170,6 +170,18 @@
                     </div>
                 @endif
                 
+                <!-- Sentiment Badge overlay -->
+                <div class="position-absolute top-0 start-0 m-2">
+                    @php
+                        $artSent = $article['sentiment'] ?? 'Neutral';
+                        $artSentClass = $artSent === 'Positive' ? 'success' : ($artSent === 'Negative' ? 'danger' : 'secondary');
+                        $artSentIcon = $artSent === 'Positive' ? 'bi-graph-up-arrow' : ($artSent === 'Negative' ? 'bi-graph-down-arrow' : 'bi-dash-circle');
+                    @endphp
+                    <span class="nb-badge nb-badge-{{ $artSentClass }}" style="font-size:0.62rem; backdrop-filter: blur(4px);">
+                        <i class="bi {{ $artSentIcon }}"></i> {{ $artSent }}
+                    </span>
+                </div>
+
                 <!-- Source Badge overlay -->
                 <div class="position-absolute top-0 end-0 m-2">
                     <span class="nb-badge nb-badge-info" style="font-size:0.62rem; backdrop-filter: blur(4px);">
@@ -177,7 +189,7 @@
                     </span>
                 </div>
 
-                <div class="nb-card-body d-flex flex-column flex-grow-1" style="padding: 14px;">
+                <div class="nb-card-body d-flex flex-column flex-grow-1" style="padding: 24px;">
                     <div style="font-size:0.68rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">
                         <i class="bi bi-clock-history"></i> 
                         @if(!empty($article['published']))
@@ -223,7 +235,7 @@
         <div class="nb-card-body">
             <div class="row g-3">
                 <div class="col-12 col-md-4" style="border-right: 1px solid var(--card-border);">
-                    <h6 style="font-weight: 800; color: var(--text-dark); margin-bottom: 10px;">📊 Threat Level Assessment</h6>
+                    <h6 style="font-weight: 800; color: var(--text-dark); margin-bottom: 10px;"> Threat Level Assessment</h6>
                     @php
                         $negPct = $data['negative_pct'] ?? 0;
                         $threatLevel = $negPct > 60 ? 'CRITICAL' : ($negPct > 40 ? 'HIGH' : ($negPct > 25 ? 'MODERATE' : 'LOW'));
@@ -239,7 +251,7 @@
                     <div class="risk-meter mt-2"><div class="risk-meter-fill" style="width:{{ $negPct }}%; background:{{ $threatColor }}"></div></div>
                 </div>
                 <div class="col-12 col-md-4" style="border-right: 1px solid var(--card-border);">
-                    <h6 style="font-weight: 800; color: var(--text-dark); margin-bottom: 10px;">🔍 Top Sources Analyzed</h6>
+                    <h6 style="font-weight: 800; color: var(--text-dark); margin-bottom: 10px;"> Top Sources Analyzed</h6>
                     @php
                         $sources = collect($data['articles'])->pluck('source')->filter()->countBy()->sortDesc()->take(5);
                     @endphp
@@ -251,14 +263,14 @@
                     @endforeach
                 </div>
                 <div class="col-12 col-md-4">
-                    <h6 style="font-weight: 800; color: var(--text-dark); margin-bottom: 10px;">💡 Actionable Recommendation</h6>
+                    <h6 style="font-weight: 800; color: var(--text-dark); margin-bottom: 10px;"> Actionable Recommendation</h6>
                     <p style="font-size: 0.84rem; line-height: 1.6; color: var(--text-body);">
                         @if($negPct > 50)
-                            <strong>⚠️ High Alert:</strong> Current media coverage contains a significant proportion of disruption signals. We recommend re-evaluating existing routes and activating contingency logistics plans for affected corridors.
+                            <strong>️ High Alert:</strong> Current media coverage contains a significant proportion of disruption signals. We recommend re-evaluating existing routes and activating contingency logistics plans for affected corridors.
                         @elseif($negPct > 30)
                             <strong>🟡 Moderate Vigilance:</strong> Some disruption keywords detected. Monitor closely for further developments regarding tariffs, port delays, or labor disputes.
                         @else
-                            <strong>✅ Stable Outlook:</strong> Current news landscape shows a favorable balance of growth signals versus risk indicators. Standard logistics procedures may continue.
+                            <strong> Stable Outlook:</strong> Current news landscape shows a favorable balance of growth signals versus risk indicators. Standard logistics procedures may continue.
                         @endif
                     </p>
                     <div style="font-size:0.72rem; color:var(--text-muted); margin-top:8px;">

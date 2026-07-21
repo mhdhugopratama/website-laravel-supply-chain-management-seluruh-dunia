@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Admin Dashboard — SupplyChainIQ')
+@section('title', 'Admin Dashboard — GoSupply')
 
 @section('content')
 <div class="nb-page-header">
@@ -62,8 +62,10 @@
                         <tr><td>Weather API</td><td><span class="nb-badge nb-badge-success">Open-Meteo (Free)</span></td></tr>
                         <tr><td>Economic Data</td><td><span class="nb-badge nb-badge-info">World Bank API</span></td></tr>
                         <tr><td>Exchange Rates</td><td><span class="nb-badge nb-badge-info">ExchangeRate API</span></td></tr>
-                        <tr><td>News</td><td><span class="nb-badge nb-badge-purple">GNews + DB Cache</span></td></tr>
-                        <tr><td>Maps</td><td><span class="nb-badge nb-badge-success">Leaflet + OpenStreetMap</span></td></tr>
+                        <tr><td>News API</td><td><span class="nb-badge nb-badge-purple">GNews + DB Cache</span></td></tr>
+                        <tr><td>Maps & Geolocation</td><td><span class="nb-badge nb-badge-success">Leaflet + OpenStreetMap</span></td></tr>
+                        <tr><td>Country Data</td><td><span class="nb-badge nb-badge-warning">REST Countries API</span></td></tr>
+                        <tr><td>Marine Traffic / Ports</td><td><span class="nb-badge nb-badge-danger">World Port Index Dataset</span></td></tr>
                     </table>
                 </div>
             </div>
