@@ -1,59 +1,85 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Global Risk Intelligence Dashboard
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sebuah sistem manajemen rantai pasok (Supply Chain Management) berskala global berbasis web yang dibangun menggunakan **Laravel**. Aplikasi ini membantu pengusaha, perusahaan logistik, dan analis untuk memantau tingkat risiko, cuaca ekstrim, berita terkini, dan fluktuasi mata uang dari berbagai negara yang dapat berdampak pada jalur distribusi.
 
-## About Laravel
+## Fitur Utama 🚀
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+*   🌍 **Dashboard Peta Global (Interactive Map)**: Melihat visualisasi negara-negara berdasarkan tingkat risiko logistik menggunakan peta dinamis (Leaflet.js).
+*   🌦️ **Analisis Dampak Cuaca (Weather Impact)**: Memantau data cuaca dari berbagai negara (suhu, angin, curah hujan) secara *real-time* via Open-Meteo API. Sistem otomatis mendeteksi negara mana yang mengalami cuaca paling ekstrim maupun paling stabil.
+*   📰 **Berita Logistik Terkini (News Alert)**: Mengambil berita internasional terbaru terkait ekonomi, konflik, dan logistik menggunakan GNews API yang dilengkapi dengan sistem *caching* cerdas dan analisis sentimen (Positif/Negatif/Netral).
+*   💱 **Pantauan Mata Uang (Currency Rates)**: Memantau fluktuasi kurs mata uang (Exchange Rate) dari berbagai negara terhadap USD.
+*   ⚖️ **Perbandingan Negara (Compare)**: Membandingkan tingkat risiko dan intelijen rantai pasok antara dua negara secara spesifik (Stabilitas Ekonomi, Risiko Iklim, dan Sentimen Publik).
+*   ⚓ **Manajemen Pelabuhan (Port Distribution)**: Menampilkan data sebaran pelabuhan penting yang ada di berbagai negara beserta status kemanannya.
+*   ⚙️ **Admin Control Panel**: Sistem manajemen berbasis admin untuk mengatur data *User*, *Port*, dan menulis Artikel (Berita Internal).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Teknologi yang Digunakan 💻
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+*   **Backend:** Laravel 11, PHP 8.2+
+*   **Database:** SQLite / MySQL (bisa disesuaikan di `.env`)
+*   **Frontend:** Blade Templating, Vanilla CSS (Custom Design System)
+*   **External APIs:**
+    *   REST Countries API (Data dasar negara)
+    *   Open-Meteo API (Data cuaca)
+    *   GNews API (Berita global)
+    *   ExchangeRate-API (Mata uang)
+*   **Libraries:** Leaflet.js (Map), Chart.js (Grafik)
 
-## Learning Laravel
+## Persyaratan Instalasi (Requirements) 🛠️
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Sebelum memulai, pastikan komputer Anda sudah terpasang:
+*   [PHP](https://www.php.net/) (Versi >= 8.2)
+*   [Composer](https://getcomposer.org/)
+*   [Node.js & NPM](https://nodejs.org/)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Cara Instalasi & Menjalankan Aplikasi 🏃‍♂️
 
-## Laravel Sponsors
+1. **Clone repository ini** ke komputer Anda:
+   ```bash
+   git clone https://github.com/mhdhugopratama/website-laravel-supply-chain-management-seluruh-dunia.git
+   cd website-laravel-supply-chain-management-seluruh-dunia
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2. **Install dependency PHP** menggunakan Composer:
+   ```bash
+   composer install
+   ```
 
-### Premium Partners
+3. **Salin konfigurasi environment**:
+   ```bash
+   cp .env.example .env
+   ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+4. **Buat Application Key**:
+   ```bash
+   php artisan key:generate
+   ```
 
-## Contributing
+5. **Konfigurasi API Keys (Opsional tapi Penting)**:
+   Buka file `.env` dan masukkan API Key Anda jika ingin data *real-time* berjalan maksimal:
+   ```env
+   GNEWS_API_KEY=masukkan_api_key_gnews_anda_disini
+   EXCHANGE_RATE_API_KEY=masukkan_api_key_exchange_rate_anda_disini
+   ```
+   *(Catatan: Tanpa API key, aplikasi tetap bisa berjalan menggunakan data statis/fallback yang sudah dikonfigurasi di dalam sistem agar tidak error bagi pemula).*
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+6. **Migrasi Database dan jalankan Seeder** (untuk membuat akun Admin & data awal):
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
 
-## Code of Conduct
+7. **Jalankan server lokal**:
+   ```bash
+   php artisan serve
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+8. **Selesai!** Buka browser Anda dan kunjungi `http://127.0.0.1:8000`.
 
-## Security Vulnerabilities
+## Catatan Khusus untuk Programmer Pemula 💡
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Aplikasi ini sudah dimodifikasi agar sangat ramah dipelajari:
+*   Komentar pada kode (*code comments*) khususnya pada file `app/Services/WeatherService.php`, `app/Services/NewsService.php`, dan `app/Http/Controllers/DashboardController.php` sudah diubah menggunakan bahasa Indonesia yang sangat santai dan mudah dimengerti.
+*   Terdapat sistem *Fallback* / *Mock Data* di mana jika Anda belum memasukkan API Key atau API mengalami *limit*, aplikasi **tidak akan error**, melainkan menampilkan data bohongan (dummy data) agar Anda tetap bisa melihat bagaimana UI (tampilan) web bekerja.
+*   Meskipun penjelasan kode dan instruksi menggunakan bahasa Indonesia, seluruh teks pada tampilan (UI) dibuat menggunakan **Bahasa Inggris** secara penuh agar terlihat profesional dan bertaraf internasional.
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+*Dibuat untuk mempermudah pemantauan rantai pasok global secara cerdas.*
