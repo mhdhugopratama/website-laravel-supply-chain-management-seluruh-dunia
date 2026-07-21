@@ -5,9 +5,9 @@
 <div class="nb-page-header">
     <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
         <div>
-            <h1><i class="bi bi-pencil-square"></i> {{ isset($article) ? 'Edit Article' : 'Write New Article' }}</h1>
+            <h1>{{ isset($article) ? 'Edit Article' : 'Write New Article' }}</h1>
         </div>
-        <a href="{{ route('admin.articles') }}" class="nb-btn nb-btn-outline"><i class="bi bi-arrow-left"></i> Back</a>
+        <a href="{{ route('admin.articles') }}" class="nb-btn nb-btn-outline">Back</a>
     </div>
 </div>
 

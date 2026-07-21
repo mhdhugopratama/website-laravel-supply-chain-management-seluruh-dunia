@@ -1,14 +1,14 @@
 @extends('layouts.app')
-@section('title', 'Manage Users — Admin')
+@section('title', 'Manage Users | Admin')
 
 @section('content')
 <div class="nb-page-header">
     <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
         <div>
-            <h1><i class="bi bi-people-fill"></i> User Management</h1>
+            <h1>User Management</h1>
             <p>{{ $users->total() }} registered users</p>
         </div>
-        <a href="{{ route('admin.index') }}" class="nb-btn nb-btn-outline"><i class="bi bi-arrow-left"></i> Back</a>
+        <a href="{{ route('admin.index') }}" class="nb-btn nb-btn-outline">Back</a>
     </div>
 </div>
 

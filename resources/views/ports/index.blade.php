@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __('app.ports.title') . ' — GoSupply')
+@section('title', __('app.ports.title') . ' | GoSupply')
 @section('page_title', __('app.ports.title'))
 @section('meta_description', 'Explore major world ports on an interactive map with real-time search and filtering.')
 
@@ -9,14 +9,14 @@
 
 @section('content')
 <div class="nb-page-header">
-    <h1><i class="bi bi-anchor"></i> {{ __('app.ports.title') }}</h1>
+    <h1>{{ __('app.ports.title') }}</h1>
     <p>{{ __('app.ports.subtitle') }}</p>
 </div>
 
 <div class="row g-4">
         <div class="col-12 col-lg-8 d-flex flex-column">
             <div class="nb-card mb-3 flex-grow-1 d-flex flex-column" style="min-height: 600px;">
-                <div class="nb-card-header"><i class="bi bi-map-fill"></i> {{ __('app.ports.map') }}</div>
+                <div class="nb-card-header">{{ __('app.ports.map') }}</div>
                 <div class="nb-card-body p-0 flex-grow-1 position-relative">
                     <div id="portMap" style="position:absolute; top:0; left:0; width:100%; height:100%; border-bottom-left-radius: var(--r-lg); border-bottom-right-radius: var(--r-lg);"></div>
                 </div>
@@ -25,7 +25,7 @@
 
         <div class="col-12 col-lg-4">
             <div class="nb-card mb-3">
-                <div class="nb-card-header"><i class="bi bi-search"></i> {{ __('app.ports.search') }}</div>
+                <div class="nb-card-header">{{ __('app.ports.search') }}</div>
                 <div class="nb-card-body">
                     <form id="portsSearchForm" method="GET" action="{{ route('ports.index') }}">
                         <div class="mb-2">
@@ -49,7 +49,7 @@
             </div>
 
             <div class="nb-card" id="portListContainer">
-                <div class="nb-card-header"><i class="bi bi-list-ul"></i> {{ __('app.ports.list') }} ({{ $ports->total() }})</div>
+                <div class="nb-card-header">{{ __('app.ports.list') }} ({{ $ports->total() }})</div>
                 <div class="nb-card-body p-0">
                     <div style="max-height:400px;overflow-y:auto">
                         @foreach($ports as $port)

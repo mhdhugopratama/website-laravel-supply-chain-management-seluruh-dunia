@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', __('app.currency.title') . ' — GoSupply')
+@section('title', __('app.currency.title') . ' | GoSupply')
 @section('meta_description', 'Real-time currency exchange rates and cross-currency converter for global trade.')
 
 @section('content')
 <div class="nb-page-header">
     <div class="container-fluid px-4">
-        <h1><i class="bi bi-currency-exchange"></i> {{ __('app.currency.title') }}</h1>
+        <h1>{{ __('app.currency.title') }}</h1>
         <p>{{ __('app.currency.subtitle') }}</p>
     </div>
 </div>
@@ -14,7 +14,7 @@
     <div class="row g-4">
         <div class="col-12 col-lg-5 d-flex flex-column">
             <div class="nb-card mb-3">
-                <div class="nb-card-header"><i class="bi bi-arrow-left-right"></i> {{ __('app.currency.converter') }}</div>
+                <div class="nb-card-header">{{ __('app.currency.converter') }}</div>
                 <div class="nb-card-body">
                     <div class="mb-3">
                         <label style="font-weight:700;font-size:0.82rem">{{ __('app.currency.amount') }}</label>
@@ -53,7 +53,7 @@
             </div>
 
             <div class="nb-card flex-grow-1 d-flex flex-column">
-                <div class="nb-card-header"><i class="bi bi-graph-up-arrow"></i> {{ __('app.currency.trend_chart') }}</div>
+                <div class="nb-card-header">{{ __('app.currency.trend_chart') }}</div>
                 <div class="nb-card-body d-flex flex-column">
                     <div class="chart-wrapper flex-grow-1" style="min-height: 200px;">
                         <canvas id="rateChart"></canvas>
@@ -64,7 +64,7 @@
 
         <div class="col-12 col-lg-7 d-flex flex-column">
             <div class="nb-card h-100 d-flex flex-column">
-                <div class="nb-card-header"><i class="bi bi-table"></i> {{ __('app.currency.rates_table') }}</div>
+                <div class="nb-card-header">{{ __('app.currency.rates_table') }}</div>
                 <div class="nb-card-body d-flex flex-column">
                     <input type="text" id="rateSearch" class="nb-input mb-3" placeholder="{{ __('app.currency.filter') }}">
                     <div class="flex-grow-1" style="overflow-y:auto; min-height: 400px; max-height: 600px;">
@@ -81,7 +81,7 @@
                                 <tr class="rate-row">
                                     <td><strong>{{ $code }}</strong></td>
                                     <td>{{ number_format($rate, 4) }}</td>
-                                    <td>{{ $rate > 0 ? number_format(1 / $rate, 6) : '—' }}</td>
+                                    <td>{{ $rate > 0 ? number_format(1 / $rate, 6) : '|' }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

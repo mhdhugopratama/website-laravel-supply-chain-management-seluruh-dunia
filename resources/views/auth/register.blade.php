@@ -1,12 +1,12 @@
 @extends('layouts.app')
-@section('title', 'Register — GoSupply')
+@section('title', 'Register | GoSupply')
 
 @section('content')
 <div class="d-flex justify-content-center align-items-center" style="min-height:70vh;padding:2rem 1rem">
     <div style="width:100%;max-width:440px">
         <div class="nb-card">
             <div class="nb-card-header text-center" style="font-size:1.2rem;padding:1.2rem">
-                <i class="bi bi-person-plus-fill"></i> Create Account
+                Create Account
             </div>
             <div class="nb-card-body">
                 @if($errors->any())

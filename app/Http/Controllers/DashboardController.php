@@ -102,50 +102,63 @@ class DashboardController extends Controller
             return $result;
         });
 
-        $mapCountries = Cache::remember('dashboard_map_countries_all', 7200, function () use ($countries) {
-            $riskData = [];
-            $allValidCountries = $countries->whereNotNull('latitude')->whereNotNull('longitude')->values();
-            
+        $allValidCountries = $countries->whereNotNull('latitude')->whereNotNull('longitude')->values();
+        
+        $batchWeather = \Illuminate\Support\Facades\Cache::remember('dashboard_map_weather_batch', 3600, function() use ($allValidCountries) {
             $coords = [];
             foreach ($allValidCountries as $i => $c) {
                 $coords[$i] = ['lat' => (float)$c->latitude, 'lon' => (float)$c->longitude];
             }
-            
-            $batchWeather = $this->weather->getBatchWeather($coords);
-            
-            foreach ($allValidCountries as $i => $c) {
-                $w = $batchWeather[$i] ?? ['temperature' => 0, 'precipitation' => 0, 'wind_speed' => 0, 'weather_code' => 0];
-                
-                // Calculate realistic overall risk (Weather, Inflation, News, Currency)
-                $hash = crc32($c->iso3);
-                $detInflation = 2.0 + ($hash % 150) / 10.0; // 2% to 17%
-                $inflationRisk = $this->worldBank->inflationRiskScore($detInflation);
-                $newsRisk = 10 + ($hash % 80); // 10% to 90%
-                $currencyRisk = $this->currency->currencyRiskScore($c->currency_code);
-                $weatherRisk = $this->weather->weatherRiskScore($w);
-                
-                $overallRisk = $this->riskEngine->calculate($weatherRisk, $inflationRisk, $newsRisk, $currencyRisk);
-
-                $flagEmoji = '';
-                if (!empty($c->iso2) && strlen($c->iso2) >= 2) {
-                    $flagEmoji = mb_chr(ord(strtoupper($c->iso2)[0]) - 65 + 127462, 'UTF-8') . mb_chr(ord(strtoupper($c->iso2)[1]) - 65 + 127462, 'UTF-8');
-                }
-
-                $riskData[] = [
-                    'name'     => $c->name,
-                    'iso2'     => $c->iso2,
-                    'iso3'     => $c->iso3,
-                    'flag'     => $flagEmoji,
-                    'lat'      => (float)$c->latitude,
-                    'lon'      => (float)$c->longitude,
-                    'region'   => $c->region,
-                    'risk'     => $overallRisk['score'],
-                    'temp'     => $w['temperature'] ?? 0,
-                    'label'    => $this->weather->weatherLabel($w['weather_code'] ?? 0),
-                ];
-            }
-            return $riskData;
+            return $this->weather->getBatchWeather($coords);
         });
+
+        $riskData = [];
+        foreach ($allValidCountries as $i => $c) {
+            $w = $batchWeather[$i] ?? ['temperature' => 0, 'precipitation' => 0, 'wind_speed' => 0, 'weather_code' => 0];
+            
+            // Use Smart Caching: Match real data if already visited, otherwise fallback to hash
+            $hash = crc32($c->iso3);
+            
+            $ecoCache = \Illuminate\Support\Facades\Cache::get('worldbank_eco_' . $c->iso2);
+            if ($ecoCache) {
+                $inflationRisk = $this->worldBank->inflationRiskScore($ecoCache['inflation']);
+            } else {
+                $detInflation = 2.0 + ($hash % 150) / 10.0;
+                $inflationRisk = $this->worldBank->inflationRiskScore($detInflation);
+            }
+
+            $newsQuery = "logistics trade {$c->name}";
+            $newsCacheKey = 'news_' . md5($newsQuery . '_' . $c->name);
+            $newsCache = \App\Models\NewsCache::where('cache_key', $newsCacheKey)->first();
+            if ($newsCache && $newsCache->updated_at->diffInHours(now()) < 12) {
+                $newsRisk = $this->news->newsRiskScore($newsCache->negative_pct);
+            } else {
+                $newsRisk = 10 + ($hash % 80);
+            }
+            $currencyRisk = $this->currency->currencyRiskScore($c->currency_code);
+            $weatherRisk = $this->weather->weatherRiskScore($w);
+            
+            $overallRisk = $this->riskEngine->calculate($weatherRisk, $inflationRisk, $newsRisk, $currencyRisk);
+
+            $flagEmoji = '';
+            if (!empty($c->iso2) && strlen($c->iso2) >= 2) {
+                $flagEmoji = mb_chr(ord(strtoupper($c->iso2)[0]) - 65 + 127462, 'UTF-8') . mb_chr(ord(strtoupper($c->iso2)[1]) - 65 + 127462, 'UTF-8');
+            }
+
+            $riskData[] = [
+                'name'     => $c->name,
+                'iso2'     => $c->iso2,
+                'iso3'     => $c->iso3,
+                'flag'     => $flagEmoji,
+                'lat'      => (float)$c->latitude,
+                'lon'      => (float)$c->longitude,
+                'region'   => $c->region,
+                'risk'     => $overallRisk['score'],
+                'temp'     => $w['temperature'] ?? 0,
+                'label'    => $this->weather->weatherLabel($w['weather_code'] ?? 0),
+            ];
+        }
+        $mapCountries = $riskData;
 
         // Top 10 highest risk countries
         $topRiskCountries = collect($mapCountries)->sortByDesc('risk')->take(10)->values()->all();

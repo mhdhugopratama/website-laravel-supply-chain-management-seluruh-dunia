@@ -1,10 +1,10 @@
 @extends('layouts.app')
-@section('title', __('app.watchlist.title') . ' — GoSupply')
+@section('title', __('app.watchlist.title') . ' | GoSupply')
 
 @section('content')
 <div class="nb-page-header">
     <div class="container-fluid px-4">
-        <h1><i class="bi bi-star-fill"></i> {{ __('app.watchlist.title') }}</h1>
+        <h1>{{ __('app.watchlist.title') }}</h1>
         <p>{{ __('app.watchlist.subtitle') }}</p>
     </div>
 </div>
@@ -37,11 +37,14 @@
                             <div style="font-weight:800;font-size:1rem">{{ $country->name }}</div>
                             <div style="color:var(--nb-text-muted);font-size:0.8rem">{{ $country->iso3 }} · {{ $country->currency_code }}</div>
                         </div>
-                        <div class="d-flex flex-column gap-2">
-                            <a href="{{ route('country.show', $country->iso3) }}" class="nb-btn nb-btn-dark btn-sm">
-                                <i class="bi bi-eye"></i>
+                        <div class="d-flex gap-2 ms-auto">
+                            <a href="{{ route('country.show', $country->iso3) }}" class="nb-btn nb-btn-dark btn-sm" title="View Profile">
+                                <i class="bi bi-person-lines-fill"></i>
                             </a>
-                            <button class="nb-btn nb-btn-danger btn-sm" onclick="removeWatchlist({{ $country->id }}, this)">
+                            <a href="{{ route('analytics.index') }}?iso3={{ $country->iso3 }}" class="nb-btn nb-btn-primary btn-sm" title="View Analytics">
+                                <i class="bi bi-bar-chart-fill"></i>
+                            </a>
+                            <button class="nb-btn nb-btn-danger btn-sm" title="Remove from Watchlist" onclick="removeWatchlist({{ $country->id }}, this)">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>

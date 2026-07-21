@@ -1,10 +1,10 @@
 @extends('layouts.app')
-@section('title', __('app.compare.title') . ' — GoSupply')
+@section('title', __('app.compare.title') . ' | GoSupply')
 
 @section('content')
 <div class="nb-page-header">
     <div class="container-fluid px-4">
-        <h1><i class="bi bi-arrows-angle-expand"></i> {{ __('app.compare.title') }}</h1>
+        <h1>{{ __('app.compare.title') }}</h1>
         <p>{{ __('app.compare.subtitle') }}</p>
     </div>
 </div>
@@ -12,7 +12,7 @@
 <div class="container-fluid px-4">
     <form method="GET" action="{{ route('compare') }}" class="mb-4">
         <div class="nb-card">
-            <div class="nb-card-header"><i class="bi bi-sliders"></i> {{ __('app.compare.select') }}</div>
+            <div class="nb-card-header">{{ __('app.compare.select') }}</div>
             <div class="nb-card-body">
                 <div class="row g-3 align-items-end">
                     <div class="col-12 col-md-5">
@@ -114,7 +114,7 @@
 
         <div class="col-12 col-lg-8 d-flex flex-column">
             <div class="nb-card mb-3">
-                <div class="nb-card-header"><i class="bi bi-bar-chart"></i> {{ __('app.compare.chart') }}</div>
+                <div class="nb-card-header">{{ __('app.compare.chart') }}</div>
                 <div class="nb-card-body">
                     <div class="chart-wrapper">
                         <canvas id="compareChart" height="150"></canvas>
@@ -124,7 +124,7 @@
 
             <div class="nb-card flex-grow-1 d-flex flex-column">
                 <div class="nb-card-header" style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.05));">
-                    <i class="bi bi-lightbulb-fill" style="color: var(--nb-orange);"></i> Supply Chain Intelligence Analysis & Recommendations
+                    Supply Chain Intelligence Analysis & Recommendations
                 </div>
                 <div class="nb-card-body">
                     <div class="row g-3">
@@ -197,23 +197,30 @@
             {{-- News Country A --}}
             <div class="nb-card mb-3">
                 <div class="nb-card-header" style="background: linear-gradient(135deg, rgba(14,165,233,0.1), rgba(14,165,233,0.02)); color: var(--teal); font-size: 0.90rem;">
-                    <i class="bi bi-newspaper"></i> Live Logistics News: {{ $countryA->name }}
+                    Live Logistics News: {{ $countryA->name }}
                 </div>
                 <div class="nb-card-body" style="max-height: 290px; overflow-y: auto; ">
                     @if(empty($dataA['news']['articles']))
                         <div style="color: var(--text-muted); text-align: center; padding: 20px; font-size: 0.82rem;">No recent logistics news found.</div>
                     @else
-                        @foreach(array_slice($dataA['news']['articles'], 0, 4) as $article)
-                        <div class="py-2" style="border-bottom: 1px solid var(--card-border);">
-                            <a href="{{ $article['url'] }}" target="_blank" class="text-decoration-none" style="font-weight: 700; font-size: 0.80rem; color: var(--text-dark); display: block; line-height: 1.3;">
-                                {{ Str::limit($article['title'], 75) }}
-                            </a>
-                            <div class="d-flex justify-content-between align-items-center mt-1" style="font-size: 0.68rem; color: var(--text-muted);">
-                                <span><i class="bi bi-broadcast"></i> {{ $article['source'] }}</span>
-                                <span>{{ \Carbon\Carbon::parse($article['published'])->diffForHumans() }}</span>
+                            @foreach(array_slice($dataA['news']['articles'], 0, 4) as $article)
+                            <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 12px; margin-bottom: 12px;">
+                                <a href="{{ $article['url'] }}" target="_blank" class="text-decoration-none" style="font-weight: 700; font-size: 0.80rem; color: var(--text-dark); display: block; line-height: 1.3;">
+                                    {{ Str::limit($article['title'], 75) }}
+                                </a>
+                                @php
+                                    $artSent = $article['sentiment'] ?? 'Neutral';
+                                    $artSentClass = $artSent === 'Positive' ? 'success' : ($artSent === 'Negative' ? 'danger' : 'secondary');
+                                @endphp
+                                <div style="margin-top: 6px; margin-bottom: 6px;">
+                                    <span class="nb-badge nb-badge-{{ $artSentClass }}" style="font-size:0.62rem;">{{ $artSent }} News</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1" style="font-size: 0.70rem; color: var(--text-muted);">
+                                    <span><i class="bi bi-broadcast"></i> {{ $article['source'] }}</span>
+                                    <span>{{ \Carbon\Carbon::parse($article['published'])->diffForHumans() }}</span>
+                                </div>
                             </div>
-                        </div>
-                        @endforeach
+                            @endforeach
                     @endif
                 </div>
             </div>
@@ -221,22 +228,29 @@
             {{-- News Country B --}}
             <div class="nb-card">
                 <div class="nb-card-header" style="background: linear-gradient(135deg, rgba(236,72,153,0.1), rgba(236,72,153,0.02)); color: var(--nb-pink); font-size: 0.90rem;">
-                    <i class="bi bi-newspaper"></i> Live Logistics News: {{ $countryB->name }}
+                    Live Logistics News: {{ $countryB->name }}
                 </div>
                 <div class="nb-card-body" style="max-height: 290px; overflow-y: auto; ">
                     @if(empty($dataB['news']['articles']))
                         <div style="color: var(--text-muted); text-align: center; padding: 20px; font-size: 0.82rem;">No recent logistics news found.</div>
                     @else
                         @foreach(array_slice($dataB['news']['articles'], 0, 4) as $article)
-                        <div class="py-2" style="border-bottom: 1px solid var(--card-border);">
-                            <a href="{{ $article['url'] }}" target="_blank" class="text-decoration-none" style="font-weight: 700; font-size: 0.80rem; color: var(--text-dark); display: block; line-height: 1.3;">
-                                {{ Str::limit($article['title'], 75) }}
-                            </a>
-                            <div class="d-flex justify-content-between align-items-center mt-1" style="font-size: 0.68rem; color: var(--text-muted);">
-                                <span><i class="bi bi-broadcast"></i> {{ $article['source'] }}</span>
-                                <span>{{ \Carbon\Carbon::parse($article['published'])->diffForHumans() }}</span>
+                            <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 12px; margin-bottom: 12px;">
+                                <a href="{{ $article['url'] }}" target="_blank" class="text-decoration-none" style="font-weight: 700; font-size: 0.80rem; color: var(--text-dark); display: block; line-height: 1.3;">
+                                    {{ Str::limit($article['title'], 75) }}
+                                </a>
+                                @php
+                                    $artSent = $article['sentiment'] ?? 'Neutral';
+                                    $artSentClass = $artSent === 'Positive' ? 'success' : ($artSent === 'Negative' ? 'danger' : 'secondary');
+                                @endphp
+                                <div style="margin-top: 6px; margin-bottom: 6px;">
+                                    <span class="nb-badge nb-badge-{{ $artSentClass }}" style="font-size:0.62rem;">{{ $artSent }} News</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1" style="font-size: 0.70rem; color: var(--text-muted);">
+                                    <span><i class="bi bi-broadcast"></i> {{ $article['source'] }}</span>
+                                    <span>{{ \Carbon\Carbon::parse($article['published'])->diffForHumans() }}</span>
+                                </div>
                             </div>
-                        </div>
                         @endforeach
                     @endif
                 </div>

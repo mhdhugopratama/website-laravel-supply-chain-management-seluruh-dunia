@@ -30,7 +30,7 @@
     {{-- Economic Inflation --}}
     <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); padding: 12px; border-radius: 10px;">
         <div style="font-size: 0.70rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
-            <i class="bi bi-graph-up-arrow" style="color: var(--nb-orange);"></i> {{ __('app.country.inflation') }}
+            {{ __('app.country.inflation') }}
         </div>
         @php
             $infl = $data['economic']['inflation'];

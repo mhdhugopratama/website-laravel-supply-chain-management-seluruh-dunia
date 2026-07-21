@@ -1,12 +1,12 @@
 @extends('layouts.app')
-@section('title', 'Login — GoSupply')
+@section('title', 'Login | GoSupply')
 
 @section('content')
 <div class="d-flex justify-content-center align-items-center" style="min-height:70vh;padding:2rem 1rem">
     <div style="width:100%;max-width:440px">
         <div class="nb-card">
                 <div class="nb-card-header text-center pb-2">
-                    <i class="bi bi-lock-fill"></i> Sign In to GoSupply
+                    Sign In to GoSupply
                 </div>
             <div class="nb-card-body">
                 @if($errors->any())
@@ -27,16 +27,12 @@
                         <label for="remember" style="font-size:0.85rem;cursor:pointer">Remember me</label>
                     </div>
                     <button type="submit" class="nb-btn nb-btn-primary w-100" style="justify-content:center">
-                        <i class="bi bi-box-arrow-in-right"></i> Login
+                        Login
                     </button>
                 </form>
                 <hr style="border:1px solid rgba(255,255,255,0.18);margin:1.2rem 0">
                 <div class="text-center" style="font-size:0.85rem">
                     No account? <a href="{{ route('register') }}" style="font-weight:700">Register here</a>
-                </div>
-                <div class="mt-3 p-2" style="border:2px dashed #999;font-size:0.78rem">
-                    <strong>Demo:</strong> admin@supply.io / Admin@12345<br>
-                    <strong>User:</strong> user@supply.io / User@12345
                 </div>
             </div>
         </div>

@@ -104,15 +104,15 @@ return array (
     'select' => 'Select Countries to Compare',
     'country_a' => 'Country A',
     'country_b' => 'Country B',
-    'placeholder_a' => '— Select Country A —',
-    'placeholder_b' => '— Select Country B —',
+    'placeholder_a' => ' Select Country A ',
+    'placeholder_b' => ' Select Country B ',
     'btn' => 'Compare Now',
     'chart' => 'Visual Comparison',
   ),
   'ports' => 
   array (
     'title' => 'Global Port Location Dashboard',
-    'subtitle' => 'Interactive map of major world ports — click markers for details',
+    'subtitle' => 'Interactive map of major world ports  click markers for details',
     'map' => 'World Port Map',
     'search' => 'Search Ports',
     'port_name' => 'Port name...',
@@ -170,9 +170,9 @@ return array (
   'analytics' => 
   array (
     'title' => 'Data Visualization Analytics',
-    'subtitle' => 'Interactive trend charts — GDP, Inflation, Currency, and Risk indicators',
+    'subtitle' => 'Interactive trend charts  GDP, Inflation, Currency, and Risk indicators',
     'select' => 'Select Country:',
-    'placeholder' => '— Choose a country —',
+    'placeholder' => ' Choose a country ',
     'btn_load' => 'Load Analytics',
     'loading' => 'Loading analytics data...',
     'risk_chart' => 'Risk Score Breakdown',

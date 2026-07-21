@@ -1,10 +1,10 @@
 @extends('layouts.app')
-@section('title', 'Admin Dashboard — GoSupply')
+@section('title', 'Admin Dashboard | GoSupply')
 
 @section('content')
 <div class="nb-page-header">
     <div class="container-fluid px-4">
-        <h1><i class="bi bi-shield-lock-fill"></i> Admin Control Panel</h1>
+        <h1>Admin Control Panel</h1>
         <p>Manage users, ports, and editorial content</p>
     </div>
 </div>
@@ -14,9 +14,9 @@
         <div class="col-12 col-md-4">
             <a href="{{ route('admin.users') }}" class="text-decoration-none">
                 <div class="nb-admin-stat">
-                    <div class="nb-stat-label"><i class="bi bi-people-fill"></i> Total Users</div>
+                    <div class="nb-stat-label">Total Users</div>
                     <div class="nb-admin-stat-number" style="color:var(--nb-cyan)">{{ $userCount }}</div>
-                    <div class="nb-badge nb-badge-info mt-1">Manage →</div>
+                    <div class="nb-badge nb-badge-info mt-1">Manage</div>
                 </div>
             </a>
         </div>
@@ -25,16 +25,16 @@
                 <div class="nb-admin-stat">
                     <div class="nb-stat-label"><i class="bi bi-anchor"></i> Total Ports</div>
                     <div class="nb-admin-stat-number" style="color:var(--nb-pink)">{{ $portCount }}</div>
-                    <div class="nb-badge nb-badge-danger mt-1">Manage →</div>
+                    <div class="nb-badge nb-badge-danger mt-1">Manage</div>
                 </div>
             </a>
         </div>
         <div class="col-12 col-md-4">
             <a href="{{ route('admin.articles') }}" class="text-decoration-none">
                 <div class="nb-admin-stat">
-                    <div class="nb-stat-label"><i class="bi bi-journal-richtext"></i> Articles</div>
+                    <div class="nb-stat-label">Articles</div>
                     <div class="nb-admin-stat-number" style="color:var(--nb-green)">{{ $articleCount }}</div>
-                    <div class="nb-badge nb-badge-success mt-1">Manage →</div>
+                    <div class="nb-badge nb-badge-success mt-1">Manage</div>
                 </div>
             </a>
         </div>
@@ -43,7 +43,7 @@
     <div class="row g-3">
         <div class="col-12 col-md-4">
             <div class="nb-card">
-                <div class="nb-card-header"><i class="bi bi-gear-fill"></i> Quick Actions</div>
+                <div class="nb-card-header">Quick Actions</div>
                 <div class="nb-card-body d-flex flex-column gap-2">
                     <a href="{{ route('admin.users') }}" class="nb-btn nb-btn-cyan"><i class="bi bi-people"></i> Manage Users</a>
                     <a href="{{ route('admin.ports') }}" class="nb-btn nb-btn-purple"><i class="bi bi-anchor"></i> Manage Ports</a>
@@ -54,7 +54,7 @@
         </div>
         <div class="col-12 col-md-8">
             <div class="nb-card">
-                <div class="nb-card-header"><i class="bi bi-info-circle"></i> System Overview</div>
+                <div class="nb-card-header">System Overview</div>
                 <div class="nb-card-body">
                     <table class="nb-table">
                         <tr><td>Laravel Version</td><td><strong>12.x</strong></td></tr>

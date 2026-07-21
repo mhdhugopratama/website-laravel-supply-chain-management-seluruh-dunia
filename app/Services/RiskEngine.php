@@ -10,10 +10,10 @@ class RiskEngine
         float $newsRisk,
         float $currencyRisk
     ): array {
-        $score = (0.30 * $weatherRisk)
-               + (0.20 * $inflationRisk)
-               + (0.40 * $newsRisk)
-               + (0.10 * $currencyRisk);
+        $score = (0.40 * $weatherRisk)
+               + (0.30 * $inflationRisk)
+               + (0.10 * $newsRisk)
+               + (0.20 * $currencyRisk);
 
         $score = round(min(100, max(0, $score)), 2);
 

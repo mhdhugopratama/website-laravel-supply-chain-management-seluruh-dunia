@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', __('app.analytics.title') . ' — GoSupply')
+@section('title', __('app.analytics.title') . ' | GoSupply')
 @section('meta_description', 'Interactive analytics with GDP, inflation, currency, and risk trend charts for any country.')
 
 @section('content')
 <div class="nb-page-header">
     <div class="container-fluid px-4">
-        <h1><i class="bi bi-bar-chart-fill"></i> {{ __('app.analytics.title') }}</h1>
+        <h1>{{ __('app.analytics.title') }}</h1>
         <p>{{ __('app.analytics.subtitle') }}</p>
     </div>
 </div>
@@ -27,7 +27,7 @@
                 </div>
                 <div class="col-12 col-md-3">
                     <button class="nb-btn nb-btn-primary w-100" onclick="loadAnalytics()">
-                        <i class="bi bi-graph-up-arrow"></i> {{ __('app.analytics.btn_load') }}
+                        {{ __('app.analytics.btn_load') }}
                     </button>
                 </div>
             </div>
@@ -44,7 +44,7 @@
         {{-- Brand new Intelligence Verdict Block --}}
         <div class="nb-card mb-4" id="analyticsVerdictCard" style="display:none;">
             <div class="nb-card-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));">
-                <i class="bi bi-shield-fill-check" style="color: var(--nb-green);"></i> Supply Chain Risk Verdict & Insights
+                Supply Chain Risk Verdict & Insights
             </div>
             <div class="nb-card-body">
                 <div class="row g-3">
@@ -63,7 +63,7 @@
         <div class="row g-4">
             <div class="col-12 col-md-6">
                 <div class="chart-wrapper nb-card h-100 d-flex flex-column">
-                    <div class="nb-card-header"><i class="bi bi-graph-up"></i> {{ __('app.analytics.risk_chart') }}</div>
+                    <div class="nb-card-header">{{ __('app.analytics.risk_chart') }}</div>
                     <div class="nb-card-body flex-grow-1 d-flex align-items-center justify-content-center">
                         <div style="width:100%"><canvas id="riskChart" height="220"></canvas></div>
                     </div>
@@ -71,7 +71,7 @@
             </div>
             <div class="col-12 col-md-6">
                 <div class="chart-wrapper nb-card h-100 d-flex flex-column">
-                    <div class="nb-card-header"><i class="bi bi-pie-chart"></i> {{ __('app.analytics.pie_chart') }}</div>
+                    <div class="nb-card-header">{{ __('app.analytics.pie_chart') }}</div>
                     <div class="nb-card-body flex-grow-1 d-flex align-items-center justify-content-center">
                         <div style="width:100%"><canvas id="riskPieChart" height="220"></canvas></div>
                     </div>
@@ -79,7 +79,7 @@
             </div>
             <div class="col-12 col-md-6">
                 <div class="chart-wrapper nb-card h-100 d-flex flex-column">
-                    <div class="nb-card-header"><i class="bi bi-thermometer"></i> {{ __('app.analytics.weather_chart') }}</div>
+                    <div class="nb-card-header">{{ __('app.analytics.weather_chart') }}</div>
                     <div class="nb-card-body flex-grow-1 d-flex align-items-center justify-content-center">
                         <div style="width:100%"><canvas id="weatherChart" height="220"></canvas></div>
                     </div>
@@ -87,7 +87,7 @@
             </div>
             <div class="col-12 col-md-6">
                 <div class="chart-wrapper nb-card h-100 d-flex flex-column">
-                    <div class="nb-card-header"><i class="bi bi-bank"></i> {{ __('app.analytics.econ_chart') }}</div>
+                    <div class="nb-card-header">{{ __('app.analytics.econ_chart') }}</div>
                     <div class="nb-card-body flex-grow-1 d-flex align-items-center justify-content-center">
                         <div style="width:100%"><canvas id="econChart" height="220"></canvas></div>
                     </div>
@@ -97,7 +97,7 @@
 
         {{-- Live Logistics News Feed --}}
         <div class="nb-card mt-4" id="analyticsNewsCard" style="display:none;">
-            <div class="nb-card-header"><i class="bi bi-newspaper"></i> Live Logistics News Intelligence Feed</div>
+            <div class="nb-card-header">Live Logistics News Intelligence Feed</div>
             <div class="nb-card-body">
                 <div class="row g-3" id="analyticsNewsList"></div>
             </div>
@@ -260,7 +260,10 @@ function loadAnalytics() {
             if (!data.news || !data.news.articles || data.news.articles.length === 0) {
                 newsList.innerHTML = '<div class="col-12 text-muted text-center py-4">No recent logistics news found for this country.</div>';
             } else {
-                newsList.innerHTML = data.news.articles.slice(0, 3).map(article => `
+                newsList.innerHTML = data.news.articles.slice(0, 3).map(article => {
+                    const artSent = article.sentiment || 'Neutral';
+                    const artSentClass = artSent === 'Positive' ? 'success' : (artSent === 'Negative' ? 'danger' : 'secondary');
+                    return `
                     <div class="col-12 col-md-4">
                         <div class="nb-news-card" style="height: 100%; border: 1px solid var(--card-border); background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px;">
                             <div class="nb-news-title">
@@ -268,10 +271,13 @@ function loadAnalytics() {
                                     ${article.title}
                                 </a>
                             </div>
+                            <div style="margin-top: 8px;">
+                                <span class="nb-badge nb-badge-${artSentClass}" style="font-size:0.62rem;">${artSent} News</span>
+                            </div>
                             <div class="nb-news-meta" style="margin-top: 8px; font-size: 0.70rem; color: var(--text-muted);"><i class="bi bi-broadcast"></i> ${article.source} · ${new Date(article.published).toLocaleDateString()}</div>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             }
 
             // 1. RISK CHART
@@ -417,5 +423,16 @@ function loadAnalytics() {
             document.getElementById('analyticsLoading').style.display = 'none';
         });
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const iso3Param = params.get('iso3');
+    if (iso3Param) {
+        const select = document.getElementById('analyticsCountry');
+        if (select) {
+            select.value = iso3Param;
+            loadAnalytics();
+        }
+    }
+});
 </script>
 @endpush

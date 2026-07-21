@@ -111,7 +111,7 @@
 {{-- ── WORLD MAPS SECTION ────────────────────────────────────────────── --}}
 <div class="nb-card mb-4">
     <div class="nb-card-header">
-        <i class="bi bi-map-fill"></i> {{ __('app.dashboard.global_maps') }}
+        {{ __('app.dashboard.global_maps') }}
     </div>
     <div class="nb-card-body">
         <div class="row g-3">
@@ -128,7 +128,7 @@
                 <i class="bi bi-cloud-lightning-rain"></i> {{ __('app.dashboard.live_weather_map') }}
             </button>
             <button class="map-tab-btn" onclick="switchMap('ports',this)">
-                <i class="bi bi-anchor"></i> {{ __('app.dashboard.port_map') }}
+                <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: -0.125em;" xmlns="http://www.w3.org/2000/svg"><path d="M8 1a2 2 0 1 0 0 4 2 2 0 0 0 0-4M7 3a1 1 0 1 1 2 0 1 1 0 0 1-2 0"/><path d="M7.5 5h1v6h-1zm1 7h-1v2a.5.5 0 0 0 1 0z"/><path d="M8 15A6.5 6.5 0 0 1 1.5 8.5a.5.5 0 0 0-1 0 7.5 7.5 0 0 0 15 0 .5.5 0 0 0-1 0A6.5 6.5 0 0 1 8 15"/></svg> {{ __('app.dashboard.port_map') }}
             </button>
         </div>
 
@@ -147,10 +147,10 @@
         <div class="map-panel" id="panel-route">
             <div class="d-flex gap-2 mb-2 p-2 align-items-center" style="background:var(--card-bg); border-radius:8px; border:1px solid var(--card-border);">
                 <div id="routeStatus" class="flex-grow-1 text-center fw-bold" style="font-size:0.85rem; color:var(--primary)">
-                    <i class="bi bi-hand-index-thumb"></i> <span id="routeStatusText">{{ __('app.dashboard.step1') }}</span>
+                    <span id="routeStatusText">{{ __('app.dashboard.step1') }}</span>
                 </div>
                 <button onclick="resetRoute()" class="nb-btn nb-btn-outline" style="padding:4px 12px; font-size:0.75rem">
-                    <i class="bi bi-arrow-counterclockwise"></i> {{ __('app.dashboard.reset') }}
+                    {{ __('app.dashboard.reset') }}
                 </button>
             </div>
             <div id="routeWorldMap" style="height: 320px; width: 100%; border-radius: 10px; z-index: 1;"></div>
@@ -177,8 +177,6 @@
             <div id="portWorldMap"></div>
             <div class="map-legend mt-2">
                 <span><span class="legend-dot" style="background:#7c3aed"></span>Sea Port</span>
-                <span><span class="legend-dot" style="background:#0ea5e9"></span>Container Terminal</span>
-                <span><span class="legend-dot" style="background:#f97316"></span>Dry Port</span>
             </div>
         </div>
 
@@ -187,9 +185,9 @@
                 <div class="nb-card map-sidebar-card" style="border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: none;">
                     <div class="nb-card-body d-flex flex-column" style="padding: 12px; height: 100%;">
                         <div style="font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; color: var(--text-dark);">
-                            <i class="bi bi-search"></i> Cari Negara
+                            <i class="bi bi-search"></i> Search Country
                         </div>
-                        <input type="text" id="mapSidebarSearch" class="nb-input mb-2" placeholder="Ketik nama negara..." onkeyup="filterSidebarSearch()" style="font-size: 0.8rem; padding: 6px 10px;">
+                        <input type="text" id="mapSidebarSearch" class="nb-input mb-2" placeholder="Type country name..." onkeyup="filterSidebarSearch()" style="font-size: 0.8rem; padding: 6px 10px;">
                         <div id="mapSidebarList" class="flex-grow-1 map-sidebar-list">
                             <!-- populated via JS -->
                         </div>
@@ -205,7 +203,7 @@
     {{-- Column 1: Extreme Weather --}}
     <div class="col-12 col-lg-6">
         <div class="nb-card h-100">
-            <div class="nb-card-header"><i class="bi bi-thermometer-high" style="color:var(--red)"></i> {{ __('Top 12 Negara Cuaca Ekstrim') }}</div>
+            <div class="nb-card-header">Top 12 Extreme Weather Countries</div>
             <div class="nb-card-body">
                 <div class="row g-3">
                     @foreach($extremeWeatherCities as $city)
@@ -252,7 +250,7 @@
     {{-- Column 2: Stable Weather --}}
     <div class="col-12 col-lg-6">
         <div class="nb-card h-100">
-            <div class="nb-card-header"><i class="bi bi-thermometer-sun" style="color:var(--green)"></i> {{ __('Top 12 Negara Cuaca Stabil') }}</div>
+            <div class="nb-card-header">Top 12 Stable Weather Countries</div>
             <div class="nb-card-body">
                 <div class="row g-3">
                     @foreach($stableWeatherCities as $city)
@@ -301,7 +299,7 @@
     {{-- Column 1: Top 10 Lowest Risk --}}
     <div class="col-12 col-md-4">
         <div class="nb-card h-100">
-            <div class="nb-card-header"><i class="bi bi-shield-fill-check" style="color:var(--nb-green)"></i> {{ __('Top 10 Negara Paling Aman') }}</div>
+            <div class="nb-card-header">Top 10 Safest Countries</div>
             <div class="nb-card-body">
                 <div style="max-height: 280px; overflow-y: auto; padding-right: 5px;">
                     @foreach($bottomRiskCountries as $bc)
@@ -330,7 +328,7 @@
     {{-- Column 2: Regional Coverage --}}
     <div class="col-12 col-md-4">
         <div class="nb-card h-100">
-            <div class="nb-card-header"><i class="bi bi-map"></i> {{ __('app.dashboard.regional_coverage') }}</div>
+            <div class="nb-card-header">{{ __('app.dashboard.regional_coverage') }}</div>
             <div class="nb-card-body">
                 @php
                     $total = array_sum(array_column($regionalCoverage, 'count'));
@@ -358,7 +356,7 @@
     {{-- Column 3: Top 10 Highest Risk --}}
     <div class="col-12 col-md-4">
         <div class="nb-card h-100">
-            <div class="nb-card-header"><i class="bi bi-exclamation-triangle-fill" style="color:var(--red)"></i> {{ __('Top 10 Negara Paling Berisiko') }}</div>
+            <div class="nb-card-header">Top 10 Highest Risk Countries</div>
             <div class="nb-card-body">
                 <div style="max-height: 280px; overflow-y: auto; padding-right: 5px;">
                     @foreach($topRiskCountries as $tc)
@@ -480,8 +478,7 @@ function flyToCountry(c) {
                         </div>
                         <div style="margin-top:8px">
                             <a href="/country/${c.iso3}" style="font-size:0.75rem;font-weight:700;color:#7c3aed;text-decoration:none">
-                                View Full Profile <i class="bi bi-arrow-right"></i>
-                            </a>
+                                View Full Profile </a>
                         </div>
                     </div>`;
                 L.popup({ autoClose: true })
@@ -642,8 +639,7 @@ function initRiskMap() {
                 </div>
                 
                 <a href="/country/${c.iso3}" style="display:block; text-align:center; background:var(--primary-10); color:var(--primary); padding:8px; border-radius:6px; font-size:0.78rem; font-weight:700; text-decoration:none; transition:all 0.2s;">
-                    View Full Profile <i class="bi bi-arrow-right ms-1"></i>
-                </a>
+                    View Full Profile </a>
             </div>`;
         circleMarker(c.lat, c.lon, color, radius, popup, riskMap);
     });
@@ -809,7 +805,7 @@ function handleRouteClick(c) {
         destCountry = c;
         const m = L.circleMarker([c.lat, c.lon], {radius: 8, fillColor: '#ef4444', color: '#fff', weight: 2, fillOpacity: 1}).addTo(routeMap).bindPopup(`Destination: <img src="https://flagcdn.com/w20/${(c.iso2 || '').toLowerCase()}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:4px;"> ${c.name}`).openPopup();
         routeMarkers.push(m);
-        document.getElementById('routeStatusText').innerHTML = '<span class="text-success">{{ __("app.dashboard.route_analyzed") }} ' + originCountry.iso3 + ' <i class="bi bi-arrow-right"></i> ' + destCountry.iso3 + '</span>';
+        document.getElementById('routeStatusText').innerHTML = '<span class="text-success">{{ __("app.dashboard.route_analyzed") }} ' + originCountry.iso3 + ' ' + destCountry.iso3 + '</span>';
         drawRoute();
     }
 }
@@ -847,8 +843,7 @@ function drawRoute() {
         <div style="font-family:'Plus Jakarta Sans',sans-serif; text-align:center;">
             <div style="font-weight:700; margin-bottom:5px">Route Analysis</div>
             <div>
-                <img src="https://flagcdn.com/w20/${(originCountry.iso2 || '').toLowerCase()}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:2px;"> ${originCountry.iso3} <i class="bi bi-arrow-right"></i> 
-                <img src="https://flagcdn.com/w20/${(destCountry.iso2 || '').toLowerCase()}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:2px;"> ${destCountry.iso3}
+                <img src="https://flagcdn.com/w20/${(originCountry.iso2 || '').toLowerCase()}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:2px;"> ${originCountry.iso3} <img src="https://flagcdn.com/w20/${(destCountry.iso2 || '').toLowerCase()}.png" width="16" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:2px;"> ${destCountry.iso3}
             </div>
             <div style="margin-top:10px;">
                 <span style="background:${color}; color:#fff; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:12px;">

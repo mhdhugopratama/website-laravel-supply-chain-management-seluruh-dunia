@@ -1,20 +1,20 @@
 @extends('layouts.app')
-@section('title', 'Manage Ports — Admin')
+@section('title', 'Manage Ports | Admin')
 
 @section('content')
 <div class="nb-page-header">
     <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
         <div>
-            <h1><i class="bi bi-anchor"></i> Port Dataset Management</h1>
+            <h1>Port Dataset Management</h1>
             <p>{{ $ports->total() }} ports in database</p>
         </div>
-        <a href="{{ route('admin.index') }}" class="nb-btn nb-btn-outline"><i class="bi bi-arrow-left"></i> Back</a>
+        <a href="{{ route('admin.index') }}" class="nb-btn nb-btn-outline">Back</a>
     </div>
 </div>
 
 <div class="container-fluid px-4">
     <div class="nb-card mb-4">
-        <div class="nb-card-header"><i class="bi bi-plus-circle"></i> Add New Port</div>
+        <div class="nb-card-header">Add New Port</div>
         <div class="nb-card-body">
             <form method="POST" action="{{ route('admin.ports.store') }}">
                 @csrf

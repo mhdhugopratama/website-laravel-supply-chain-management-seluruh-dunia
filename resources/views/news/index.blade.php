@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __('app.news.title') . ' — GoSupply')
+@section('title', __('app.news.title') . ' | GoSupply')
 @section('meta_description', 'Real-time logistics, trade, and shipping intelligence with lexicon-based sentiment analysis.')
 
 @section('content')
@@ -7,20 +7,13 @@
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="fw-bold mb-1" style="color: var(--text-dark);"><i class="bi bi-globe-americas" style="color:var(--primary)"></i> {{ __('app.news.global_trade_intel') }}</h1>
+            <h1 class="fw-bold mb-1" style="color: var(--text-dark);">{{ __('app.news.global_trade_intel') }}</h1>
             <p style="color: var(--text-muted); margin-bottom:0;">{{ __('app.news.global_trade_desc') }}</p>
         </div>
         <div class="d-flex align-items-center gap-2">
             <a href="?q={{ urlencode($query) }}&refresh=1" class="nb-btn nb-btn-outline" style="font-size:0.78rem">
-                <i class="bi bi-arrow-clockwise"></i> {{ __('Refresh Live News') }}
+                {{ __('Refresh Live News') }}
             </a>
-            <span class="nb-badge {{ $data['from_cache'] ? 'nb-badge-info' : 'nb-badge-success' }}">
-                @if($data['from_cache'])
-                    <i class="bi bi-shield-check"></i> Auto-Optimized Cache
-                @else
-                    <span style="width:6px; height:6px; background:var(--nb-green); border-radius:50%; display:inline-block; animation: blinker 1s linear infinite;"></span> Live Stream
-                @endif
-            </span>
         </div>
     </div>
 
@@ -65,7 +58,7 @@
         <!-- Search and Filter Panel -->
         <div class="col-12 col-xl-6">
             <div class="nb-card h-100">
-                <div class="nb-card-header"><i class="bi bi-funnel-fill" style="color:var(--primary)"></i> {{ __('app.news.intel_filters') }}</div>
+                <div class="nb-card-header">{{ __('app.news.intel_filters') }}</div>
                 <div class="nb-card-body">
                     <form method="GET" action="{{ route('news.index') }}" class="d-flex flex-column justify-content-center h-100" style="min-height: 120px;">
                         <div class="d-flex gap-2 mb-3">
@@ -151,7 +144,7 @@
 
     <!-- Articles Grid -->
     <div class="nb-card-header mb-3" style="background: transparent; padding: 0; border: none; font-size: 0.95rem;">
-        <i class="bi bi-file-earmark-text" style="color:var(--primary)"></i> {{ __('app.news.intel_briefs') }} ({{ count($data['articles']) }})
+        {{ __('app.news.intel_briefs') }} ({{ count($data['articles']) }})
     </div>
     
     <div class="row g-3">
@@ -170,26 +163,21 @@
                     </div>
                 @endif
                 
-                <!-- Sentiment Badge overlay -->
-                <div class="position-absolute top-0 start-0 m-2">
-                    @php
-                        $artSent = $article['sentiment'] ?? 'Neutral';
-                        $artSentClass = $artSent === 'Positive' ? 'success' : ($artSent === 'Negative' ? 'danger' : 'secondary');
-                        $artSentIcon = $artSent === 'Positive' ? 'bi-graph-up-arrow' : ($artSent === 'Negative' ? 'bi-graph-down-arrow' : 'bi-dash-circle');
-                    @endphp
-                    <span class="nb-badge nb-badge-{{ $artSentClass }}" style="font-size:0.62rem; backdrop-filter: blur(4px);">
-                        <i class="bi {{ $artSentIcon }}"></i> {{ $artSent }}
-                    </span>
-                </div>
-
-                <!-- Source Badge overlay -->
-                <div class="position-absolute top-0 end-0 m-2">
-                    <span class="nb-badge nb-badge-info" style="font-size:0.62rem; backdrop-filter: blur(4px);">
-                        <i class="bi bi-broadcast"></i> {{ Str::limit($article['source'] ?? 'Unknown', 18) }}
-                    </span>
-                </div>
-
                 <div class="nb-card-body d-flex flex-column flex-grow-1" style="padding: 24px;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        @php
+                            $artSent = $article['sentiment'] ?? 'Neutral';
+                            $artSentClass = $artSent === 'Positive' ? 'success' : ($artSent === 'Negative' ? 'danger' : 'secondary');
+                        @endphp
+                        <span class="nb-badge nb-badge-{{ $artSentClass }}" style="font-size:0.62rem;">
+                            {{ $artSent }} News
+                        </span>
+                        
+                        <span class="nb-badge nb-badge-info" style="font-size:0.62rem;">
+                            {{ Str::limit($article['source'] ?? 'Unknown', 18) }}
+                        </span>
+                    </div>
+                    
                     <div style="font-size:0.68rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">
                         <i class="bi bi-clock-history"></i> 
                         @if(!empty($article['published']))
@@ -210,8 +198,7 @@
                     <!-- Explicit Button to Source -->
                     <a href="{{ $article['url'] }}" target="_blank" rel="noopener noreferrer" 
                        class="nb-btn nb-btn-outline" style="font-size:0.76rem; justify-content:center; width:100%;">
-                        {{ __('app.news.read_full') }} <i class="bi bi-box-arrow-up-right ms-1"></i>
-                    </a>
+                        {{ __('app.news.read_full') }} </a>
                 </div>
             </div>
         </div>
@@ -230,7 +217,7 @@
     @if(count($data['articles']) > 0)
     <div class="nb-card mt-4">
         <div class="nb-card-header" style="background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.03));">
-            <i class="bi bi-shield-exclamation" style="color:var(--nb-red)"></i> Supply Chain Risk Digest — Based on {{ count($data['articles']) }} Live Articles
+            Supply Chain Risk Digest | Based on {{ count($data['articles']) }} Live Articles
         </div>
         <div class="nb-card-body">
             <div class="row g-3">

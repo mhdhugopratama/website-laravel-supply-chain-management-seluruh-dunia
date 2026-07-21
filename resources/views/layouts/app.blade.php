@@ -97,7 +97,7 @@
             </a>
             <a href="{{ route('compare') }}"
                class="sb-link {{ request()->routeIs('compare') ? 'active' : '' }}">
-                <i class="bi bi-arrows-angle-expand"></i>
+                <i class="bi bi-arrow-left-right"></i>
                 <span>{{ __('app.nav.compare') }}</span>
             </a>
             <a href="{{ route('analytics.index') }}"
@@ -153,12 +153,6 @@
         </nav>
 
         <div class="sb-footer">
-            <div class="sb-lang">
-                <a href="{{ route('lang.switch', 'en') }}"
-                   class="sb-lang-btn {{ app()->getLocale() === 'en' ? 'active' : '' }}">🇬🇧 EN</a>
-                <a href="{{ route('lang.switch', 'id') }}"
-                   class="sb-lang-btn {{ app()->getLocale() === 'id' ? 'active' : '' }}">🇮🇩 ID</a>
-            </div>
             <button class="sb-theme-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">
                 <i class="bi bi-moon-fill" id="themeIcon"></i>
                 <span id="themeLabel">Dark</span>
@@ -167,8 +161,7 @@
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="sb-logout-btn" title="{{ __('app.nav.logout') }}">
-                    <i class="bi bi-box-arrow-left"></i>
-                    <span>{{ __('app.nav.logout') }}</span>
+                    <i class="bi bi-box-arrow-right"></i> <span>{{ __('app.nav.logout') }}</span>
                 </button>
             </form>
             @else

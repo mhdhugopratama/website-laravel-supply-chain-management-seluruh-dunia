@@ -34,7 +34,7 @@
             </button>
             @endauth
             <a href="{{ route('dashboard') }}" class="nb-btn nb-btn-outline">
-                <i class="bi bi-arrow-left"></i> {{ __('app.country.back') }}
+                {{ __('app.country.back') }}
             </a>
         </div>
     </div>
@@ -44,7 +44,7 @@
     <div class="row g-4">
         <div class="col-12 col-lg-4 d-flex flex-column">
             <div class="nb-card mb-3">
-                <div class="nb-card-header"><i class="bi bi-shield-exclamation"></i> {{ __('app.risk.score') }}</div>
+                <div class="nb-card-header">{{ __('app.risk.score') }}</div>
                 <div class="nb-card-body text-center">
                     <div class="risk-score-display mb-2" style="color: {{ $risk['level']['color'] }}">
                         {{ $risk['score'] }}
@@ -77,7 +77,7 @@
             </div>
 
             <div class="nb-card mb-3 flex-grow-1">
-                <div class="nb-card-header"><i class="bi bi-info-circle"></i> {{ __('app.country.profile') }}</div>
+                <div class="nb-card-header">{{ __('app.country.profile') }}</div>
                 <div class="nb-card-body d-flex flex-column justify-content-center">
                     <table class="nb-table">
                         <tr><td><strong>{{ __('app.country.population') }}</strong></td><td>{{ $country->population ? number_format($country->population) : __('app.country.no_data') }}</td></tr>
@@ -96,7 +96,7 @@
             <div class="row g-3 mb-3">
                 <div class="col-12 col-md-6">
                     <div class="nb-card h-100">
-                        <div class="nb-card-header"><i class="bi bi-cloud-sun"></i> {{ __('app.country.weather') }}</div>
+                        <div class="nb-card-header">{{ __('app.country.weather') }}</div>
                         <div class="nb-card-body">
                             @if(isset($weatherData['error']))
                                 <div class="nb-alert nb-alert-danger">{{ __('app.country.no_data') }}</div>
@@ -137,7 +137,7 @@
 
                 <div class="col-12 col-md-6">
                     <div class="nb-card h-100">
-                        <div class="nb-card-header"><i class="bi bi-bank"></i> {{ __('app.country.economic') }}</div>
+                        <div class="nb-card-header">{{ __('app.country.economic') }}</div>
                         <div class="nb-card-body">
                             <div class="row g-3">
                                 <div class="col-6 mb-2">
@@ -151,7 +151,7 @@
                                     </div>
                                 </div>
                                 <div class="col-6 mb-2">
-                                    <div class="nb-stat-label"><i class="bi bi-arrow-up-circle"></i> {{ __('app.country.inflation') }}</div>
+                                    <div class="nb-stat-label">{{ __('app.country.inflation') }}</div>
                                     <div style="font-weight:800;font-size:1.1rem;margin-top:0.2rem;color:{{ ($economicData['inflation'] ?? 0) > 10 ? 'var(--nb-red)' : (($economicData['inflation'] ?? 0) > 5 ? 'var(--nb-orange)' : 'var(--nb-green)') }}">
                                         @if(!is_null($economicData['inflation']))
                                             {{ number_format($economicData['inflation'], 2) }}%
@@ -161,7 +161,7 @@
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="nb-stat-label"><i class="bi bi-box-arrow-up"></i> {{ __('app.country.exports') }}</div>
+                                    <div class="nb-stat-label">{{ __('app.country.exports') }}</div>
                                     <div style="font-weight:800;font-size:1.1rem;margin-top:0.2rem">
                                         @if(!empty($economicData['exports']))
                                             ${{ number_format($economicData['exports'] / 1e9, 1) }}B
@@ -171,7 +171,7 @@
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="nb-stat-label"><i class="bi bi-box-arrow-in-down"></i> {{ __('app.country.imports') }}</div>
+                                    <div class="nb-stat-label">{{ __('app.country.imports') }}</div>
                                     <div style="font-weight:800;font-size:1.1rem;margin-top:0.2rem">
                                         @if(!empty($economicData['imports']))
                                             ${{ number_format($economicData['imports'] / 1e9, 1) }}B
@@ -187,7 +187,7 @@
             </div>
 
             <div class="nb-card mb-3">
-                <div class="nb-card-header"><i class="bi bi-map"></i> {{ __('app.country.map') }}</div>
+                <div class="nb-card-header">{{ __('app.country.map') }}</div>
                 <div class="nb-card-body p-0">
                     <div class="nb-map-wrapper">
                         <div id="mainMap"></div>
@@ -195,41 +195,68 @@
                 </div>
             </div>
 
+        </div> <!-- close col-12 col-lg-8 -->
+    </div> <!-- close row g-4 -->
+    
+    <!-- LATEST NEWS SECTION FULL WIDTH AT THE BOTTOM -->
+    <div class="row mt-4 mb-4">
+        <div class="col-12">
             <div class="nb-card">
-                <div class="nb-card-header"><i class="bi bi-newspaper"></i> {{ __('app.country.news') }}</div>
+                <div class="nb-card-header">{{ __('app.country.news') }} - {{ $country->name }}</div>
                 <div class="nb-card-body">
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <div class="nb-stat-label mb-1">{{ __('app.country.sentiment') }}</div>
-                        <div class="sentiment-bar mb-1">
-                            <div class="sentiment-pos" style="width: {{ $newsData['positive_pct'] }}%"></div>
-                            <div class="sentiment-neu" style="width: {{ $newsData['neutral_pct'] }}%"></div>
-                            <div class="sentiment-neg" style="width: {{ $newsData['negative_pct'] }}%"></div>
+                        <div class="sentiment-bar mb-2" style="height: 10px; border-radius: 4px; overflow: hidden; display: flex;">
+                            <div class="sentiment-pos" style="width: {{ $newsData['positive_pct'] }}%; background: var(--nb-green);"></div>
+                            <div class="sentiment-neu" style="width: {{ $newsData['neutral_pct'] }}%; background: #b8a000;"></div>
+                            <div class="sentiment-neg" style="width: {{ $newsData['negative_pct'] }}%; background: var(--nb-red);"></div>
                         </div>
-                        <div class="d-flex gap-3" style="font-size:0.75rem;font-weight:700">
+                        <div class="d-flex gap-3" style="font-size:0.8rem; font-weight:700;">
                             <span style="color:var(--nb-green)">● {{ __('app.news.positive_label') }} {{ $newsData['positive_pct'] }}%</span>
                             <span style="color:#b8a000">● {{ __('app.news.neutral_label') }} {{ $newsData['neutral_pct'] }}%</span>
                             <span style="color:var(--nb-red)">● {{ __('app.news.negative_label') }} {{ $newsData['negative_pct'] }}%</span>
                         </div>
                     </div>
-                    <div class="row g-2">
-                        @foreach(array_slice($newsData['articles'], 0, 3) as $article)
-                        <div class="col-12 col-md-4">
-                            <div class="nb-news-card">
-                                <div class="nb-news-title">
-                                    <a href="{{ $article['url'] }}" target="_blank" class="text-decoration-none" style="color:var(--nb-text)">
-                                        {{ Str::limit($article['title'], 80) }}
-                                    </a>
-                                </div>
-                                <div class="nb-news-meta">{{ $article['source'] }} · {{ \Carbon\Carbon::parse($article['published'])->diffForHumans() }}</div>
-                            </div>
+                    
+                    @if(empty($newsData['articles']))
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-journal-x" style="font-size: 2rem;"></i>
+                            <p class="mt-2">{{ __('app.country.no_data') ?? 'No news articles found for this country.' }}</p>
                         </div>
-                        @endforeach
-                    </div>
+                    @else
+                        <div class="row g-3">
+                            @foreach(array_slice($newsData['articles'], 0, 6) as $article)
+                            <div class="col-12 col-md-6 col-xl-4">
+                                <div class="nb-card h-100" style="border: 1px solid var(--card-border); background: var(--bg); box-shadow: none;">
+                                    <div class="nb-card-body d-flex flex-column">
+                                        <a href="{{ $article['url'] }}" target="_blank" class="text-decoration-none" style="color:var(--text-dark); font-weight: 700; font-size: 0.95rem; line-height: 1.4; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                            {{ $article['title'] }}
+                                        </a>
+                                        <p style="font-size: 0.8rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 12px; flex-grow: 1;">
+                                            {{ strip_tags($article['description'] ?? '') }}
+                                        </p>
+                                        @php
+                                            $artSent = $article['sentiment'] ?? 'Neutral';
+                                            $artSentClass = $artSent === 'Positive' ? 'success' : ($artSent === 'Negative' ? 'danger' : 'secondary');
+                                        @endphp
+                                        <div style="margin-bottom: 8px;">
+                                            <span class="nb-badge nb-badge-{{ $artSentClass }}" style="font-size:0.62rem;">{{ $artSent }} News</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-auto" style="font-size:0.75rem; font-weight:600; color:var(--text-muted);">
+                                            <span><i class="bi bi-building"></i> {{ $article['source'] }}</span>
+                                            <span><i class="bi bi-clock"></i> {{ \Carbon\Carbon::parse($article['published'])->diffForHumans() }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-</div>
+</div> <!-- close container-fluid px-4 -->
 @endsection
 
 @push('scripts')
@@ -272,7 +299,7 @@ if (ports && ports.length > 0) {
             fillOpacity: 0.9
         })
         .addTo(map)
-        .bindPopup(`<strong><i class="bi bi-anchor"></i> ${p.name}</strong><br>UN/LOCODE: ${p.un_locode || 'N/A'}<br>Type: ${p.type || 'Sea Port'}`);
+        .bindPopup(`<strong><svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: -0.125em;" xmlns="http://www.w3.org/2000/svg"><path d="M8 1a2 2 0 1 0 0 4 2 2 0 0 0 0-4M7 3a1 1 0 1 1 2 0 1 1 0 0 1-2 0"/><path d="M7.5 5h1v6h-1zm1 7h-1v2a.5.5 0 0 0 1 0z"/><path d="M8 15A6.5 6.5 0 0 1 1.5 8.5a.5.5 0 0 0-1 0 7.5 7.5 0 0 0 15 0 .5.5 0 0 0-1 0A6.5 6.5 0 0 1 8 15"/></svg> ${p.name}</strong><br>UN/LOCODE: ${p.un_locode || 'N/A'}<br>Type: ${p.type || 'Sea Port'}`);
         portMarkers.push(pm);
     });
 

@@ -104,15 +104,15 @@ return array (
     'select' => 'Pilih Negara yang Akan Dibandingkan',
     'country_a' => 'Negara A',
     'country_b' => 'Negara B',
-    'placeholder_a' => '— Pilih Negara A —',
-    'placeholder_b' => '— Pilih Negara B —',
+    'placeholder_a' => ' Pilih Negara A ',
+    'placeholder_b' => ' Pilih Negara B ',
     'btn' => 'Bandingkan Sekarang',
     'chart' => 'Perbandingan Visual',
   ),
   'ports' => 
   array (
     'title' => 'Dasbor Lokasi Pelabuhan Global',
-    'subtitle' => 'Peta interaktif pelabuhan dunia — klik marker untuk detailnya',
+    'subtitle' => 'Peta interaktif pelabuhan dunia  klik marker untuk detailnya',
     'map' => 'Peta Pelabuhan Dunia',
     'search' => 'Cari Pelabuhan',
     'port_name' => 'Nama pelabuhan...',
@@ -170,9 +170,9 @@ return array (
   'analytics' => 
   array (
     'title' => 'Analitik Visualisasi Data',
-    'subtitle' => 'Grafik tren interaktif — PDB, Inflasi, Mata Uang, dan indikator Risiko',
+    'subtitle' => 'Grafik tren interaktif  PDB, Inflasi, Mata Uang, dan indikator Risiko',
     'select' => 'Pilih Negara:',
-    'placeholder' => '— Pilih sebuah negara —',
+    'placeholder' => ' Pilih sebuah negara ',
     'btn_load' => 'Muat Analitik',
     'loading' => 'Memuat data analitik...',
     'risk_chart' => 'Rincian Skor Risiko',
