@@ -69,6 +69,54 @@
             color: var(--text-dark) !important;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
         }
+
+        /* Complete Hide for Google Translate Top Banner, Icon Popup, Tooltips & Text Highlight */
+        iframe.goog-te-banner-frame, .goog-te-banner-frame, body > .skiptranslate, iframe.skiptranslate, 
+        #goog-gt-tt, .goog-te-balloon-frame, .goog-te-spinner-pos, .goog-tooltip, .goog-tooltip:hover,
+        [class*="VIpgJd"], .VIpgJd-Z44Wfd-LgDevf, .VIpgJd-Z44Wfd-a91s4d-wUfd2e, .VIpgJd-Z44Wfd-a91s4d-O22p2e {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            width: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+        body { top: 0px !important; position: static !important; }
+        .goog-text-highlight {
+            background-color: transparent !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            pointer-events: none !important;
+        }
+        #google_translate_element, .goog-te-gadget { display: none !important; }
+
+        /* High-Contrast Style for EN/ID Language Buttons */
+        .sb-lang { display: flex; gap: 6px; width: 100%; margin-bottom: 8px; }
+        .sb-lang-btn {
+            flex: 1;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: var(--r-md);
+            color: var(--text-dark, #cbd5e1);
+            background: var(--card-bg, rgba(255, 255, 255, 0.08));
+            border: 1px solid var(--card-border, rgba(255, 255, 255, 0.2));
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+        .sb-lang-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            color: #a78bfa;
+            border-color: #7c3aed;
+        }
+        .sb-lang-btn.active {
+            background: #7c3aed !important;
+            color: #ffffff !important;
+            border-color: #7c3aed !important;
+            box-shadow: 0 2px 10px rgba(124, 58, 237, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -153,6 +201,10 @@
         </nav>
 
         <div class="sb-footer">
+            <div class="sb-lang mb-1 notranslate" translate="no">
+                <button type="button" class="sb-lang-btn notranslate" translate="no" id="btnLangEN" onclick="switchGoogleLanguage('en')"><span class="notranslate" translate="no">EN</span></button>
+                <button type="button" class="sb-lang-btn notranslate" translate="no" id="btnLangID" onclick="switchGoogleLanguage('id')"><span class="notranslate" translate="no">ID</span></button>
+            </div>
             <button class="sb-theme-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">
                 <i class="bi bi-moon-fill" id="themeIcon"></i>
                 <span id="themeLabel">Dark</span>
@@ -288,7 +340,26 @@ document.addEventListener('click', function(e) {
 
     function tick() {
         const el = document.getElementById('liveTime');
-        if (el) el.textContent = new Date().toLocaleTimeString();
+        if (!el) return;
+        
+        const now = new Date();
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        const dayName = days[now.getDay()];
+        const dateNum = now.getDate();
+        const monthName = months[now.getMonth()];
+        const year = now.getFullYear();
+        
+        const timeStr = now.toLocaleTimeString('en-US', { hour12: true });
+        
+        const offsetMin = -now.getTimezoneOffset();
+        const offsetHours = Math.floor(Math.abs(offsetMin) / 60);
+        const offsetMins = Math.abs(offsetMin) % 60;
+        const sign = offsetMin >= 0 ? '+' : '-';
+        const utcStr = `UTC${sign}${offsetHours}${offsetMins > 0 ? ':' + (offsetMins < 10 ? '0' : '') + offsetMins : ''}`;
+        
+        el.textContent = `${dayName}, ${dateNum} ${monthName} ${year} • ${timeStr} (${utcStr})`;
     }
     tick();
     setInterval(tick, 1000);
@@ -325,5 +396,65 @@ document.addEventListener('click', function(e) {
         });
     });
 </script>
+
+<div id="google_translate_element" style="display:none;"></div>
+<script type="text/javascript">
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+function updateLangBtnState() {
+    const googtrans = getCookie('googtrans');
+    const btnEN = document.getElementById('btnLangEN');
+    const btnID = document.getElementById('btnLangID');
+    if (!btnEN || !btnID) return;
+    
+    if (googtrans && googtrans.includes('/id')) {
+        btnID.classList.add('active');
+        btnEN.classList.remove('active');
+    } else {
+        btnEN.classList.add('active');
+        btnID.classList.remove('active');
+    }
+}
+
+function switchGoogleLanguage(lang) {
+    const targetVal = '/en/' + lang;
+    const currentCookie = getCookie('googtrans');
+    
+    if (lang === 'en' && (!currentCookie || currentCookie.endsWith('/en'))) {
+        return;
+    }
+    if (lang === 'id' && currentCookie && currentCookie.endsWith('/id')) {
+        return;
+    }
+    
+    document.cookie = "googtrans=" + targetVal + "; path=/;";
+    document.cookie = "googtrans=" + targetVal + "; path=/; domain=" + window.location.hostname;
+    
+    const select = document.querySelector('.goog-te-combo');
+    if (select) {
+        select.value = lang;
+        select.dispatchEvent(new Event('change'));
+        updateLangBtnState();
+    } else {
+        window.location.reload();
+    }
+}
+
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,id',
+        autoDisplay: false
+    }, 'google_translate_element');
+}
+
+document.addEventListener('DOMContentLoaded', updateLangBtnState);
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

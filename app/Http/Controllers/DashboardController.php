@@ -115,30 +115,39 @@ class DashboardController extends Controller
         $riskData = [];
         foreach ($allValidCountries as $i => $c) {
             $w = $batchWeather[$i] ?? ['temperature' => 0, 'precipitation' => 0, 'wind_speed' => 0, 'weather_code' => 0];
-            
-            // trik cache: kl udh pernah diload kasih data asli, kl blm kasih data abal2 dulu
-            $hash = crc32($c->iso3);
-            
-            $ecoCache = \Illuminate\Support\Facades\Cache::get('worldbank_eco_' . $c->iso2);
-            if ($ecoCache) {
-                $inflationRisk = $this->worldBank->inflationRiskScore($ecoCache['inflation']);
-            } else {
-                $detInflation = 2.0 + ($hash % 150) / 10.0;
-                $inflationRisk = $this->worldBank->inflationRiskScore($detInflation);
-            }
 
-            $newsQuery = "logistics trade {$c->name}";
-            $newsCacheKey = 'news_' . md5($newsQuery . '_' . $c->name);
-            $newsCache = \App\Models\NewsCache::where('cache_key', $newsCacheKey)->first();
-            if ($newsCache && $newsCache->updated_at->diffInHours(now()) < 12) {
-                $newsRisk = $this->news->newsRiskScore($newsCache->negative_pct);
+            // Cek cache dulu — kalau negara ini pernah dibuka profilnya,
+            // pakai data risiko asli yang sudah di-cache (100% sama dgn halaman detail)
+            $cachedRisk = Cache::get('country_risk_' . $c->iso2);
+
+            if ($cachedRisk) {
+                $overallRisk = $cachedRisk;
             } else {
-                $newsRisk = 10 + ($hash % 80);
+                // Belum pernah dikunjungi — pakai estimasi cepat (tanpa API call)
+                $hash = crc32($c->iso3);
+                $weatherRisk   = $this->weather->weatherRiskScore($w);
+
+                // Coba baca dari cache WorldBank (sudah ada kalau pernah diload)
+                $wbCache = Cache::get('worldbank_' . $c->iso2);
+                if ($wbCache) {
+                    $inflationRisk = $this->worldBank->inflationRiskScore($wbCache['inflation']);
+                } else {
+                    $inflationRisk = $this->worldBank->inflationRiskScore(2.0 + ($hash % 150) / 10.0);
+                }
+
+                // Coba baca dari cache News
+                $newsQuery    = "logistics trade {$c->name}";
+                $newsCacheKey = 'news_' . md5($newsQuery . '_' . $c->name);
+                $newsCache    = \App\Models\NewsCache::where('cache_key', $newsCacheKey)->first();
+                if ($newsCache && $newsCache->updated_at->diffInHours(now()) < 12) {
+                    $newsRisk = $this->news->newsRiskScore($newsCache->negative_pct);
+                } else {
+                    $newsRisk = 10 + ($hash % 80);
+                }
+
+                $currencyRisk = $this->currency->currencyRiskScore($c->currency_code);
+                $overallRisk  = $this->riskEngine->calculate($weatherRisk, $inflationRisk, $newsRisk, $currencyRisk);
             }
-            $currencyRisk = $this->currency->currencyRiskScore($c->currency_code);
-            $weatherRisk = $this->weather->weatherRiskScore($w);
-            
-            $overallRisk = $this->riskEngine->calculate($weatherRisk, $inflationRisk, $newsRisk, $currencyRisk);
 
             $flagEmoji = '';
             if (!empty($c->iso2) && strlen($c->iso2) >= 2) {
@@ -146,16 +155,17 @@ class DashboardController extends Controller
             }
 
             $riskData[] = [
-                'name'     => $c->name,
-                'iso2'     => $c->iso2,
-                'iso3'     => $c->iso3,
-                'flag'     => $flagEmoji,
-                'lat'      => (float)$c->latitude,
-                'lon'      => (float)$c->longitude,
-                'region'   => $c->region,
-                'risk'     => $overallRisk['score'],
-                'temp'     => $w['temperature'] ?? 0,
-                'label'    => $this->weather->weatherLabel($w['weather_code'] ?? 0),
+                'name'           => $c->name,
+                'iso2'           => $c->iso2,
+                'iso3'           => $c->iso3,
+                'flag'           => $flagEmoji,
+                'lat'            => (float)$c->latitude,
+                'lon'            => (float)$c->longitude,
+                'region'         => $c->region,
+                'risk'           => $overallRisk['score'],
+                'risk_level'     => $overallRisk['level']['label'],
+                'temp'           => $w['temperature'] ?? 0,
+                'label'          => $this->weather->weatherLabel($w['weather_code'] ?? 0),
             ];
         }
         $mapCountries = $riskData;
@@ -237,8 +247,10 @@ class DashboardController extends Controller
         $inflationRisk = $this->worldBank->inflationRiskScore($economicData['inflation']);
         $newsRisk      = $this->news->newsRiskScore($newsData['negative_pct']);
         $currencyRisk  = $this->currency->currencyRiskScore($country->currency_code);
+        $risk          = $this->riskEngine->calculate($weatherRisk, $inflationRisk, $newsRisk, $currencyRisk);
 
-        $risk = $this->riskEngine->calculate($weatherRisk, $inflationRisk, $newsRisk, $currencyRisk);
+        // Simpan ke cache supaya peta dashboard langsung pakai skor yang sama
+        Cache::put('country_risk_' . $country->iso2, $risk, 3600);
 
         $inWatchlist = false;
         if (Auth::check()) {

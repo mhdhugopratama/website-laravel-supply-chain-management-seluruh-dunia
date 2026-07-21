@@ -447,8 +447,42 @@ function switchMap(tab, btn) {
     }, 100);
 }
 
+function buildCountryRiskPopup(c) {
+    const color = riskColor(c.risk);
+    const riskLevel = c.risk_level || (c.risk < 30 ? 'Low Risk' : (c.risk < 60 ? 'Medium Risk' : 'High Risk'));
+
+    return `
+        <div style="font-family:'Plus Jakarta Sans',sans-serif; min-width:180px; padding: 4px 2px;">
+            <div style="display:flex; align-items:center; margin-bottom:10px;">
+                <img src="https://flagcdn.com/w40/${(c.iso2 || '').toLowerCase()}.png" width="24" alt="Flag" style="border-radius:4px; margin-right:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"> 
+                <div style="line-height:1.2;">
+                    <div style="font-weight:700; font-size:0.95rem; color:var(--text-dark, #0f172a);">${c.name}</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted, #64748b); font-weight:500;">${c.region || ''}</div>
+                </div>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; background:${color}15; padding:6px 10px; border-radius:6px; border: 1px solid ${color}30;">
+                    <span style="font-size:0.75rem; font-weight:600; color:${color};"><i class="bi bi-shield-fill-exclamation me-1"></i> ${riskLevel}</span>
+                    <span style="font-weight:800; font-size:0.85rem; color:${color};">${Math.round(c.risk)} / 100</span>
+                </div>
+                
+                <div style="display:flex; align-items:center; background:var(--bg, #f8fafc); padding:6px 10px; border-radius:6px; border: 1px solid var(--border-color, #e2e8f0);">
+                    <span style="font-size:0.75rem; font-weight:600; color:var(--text-muted, #64748b);"><i class="bi bi-thermometer-half me-1"></i> ${c.temp}°C</span>
+                    <span style="margin:0 6px; color:#cbd5e1;">|</span>
+                    <span style="font-size:0.75rem; font-weight:600; color:var(--text-muted, #64748b);">${c.label}</span>
+                </div>
+            </div>
+            
+            <a href="/country/${c.iso3}" style="display:block; text-align:center; background:var(--primary-10, #ede9fe); color:var(--primary, #7c3aed); padding:8px; border-radius:6px; font-size:0.78rem; font-weight:700; text-decoration:none; transition:all 0.2s;">
+                View Full Profile </a>
+        </div>`;
+}
+
 // Sidebar Search functionality with FlyTo (Animated Zoom)
 function flyToCountry(c) {
+    if (!c.lat || !c.lon) return;
+    
     let mapToFly = null;
     if (currentMapTab === 'risk') mapToFly = riskMap;
     else if (currentMapTab === 'route') mapToFly = routeMap;
@@ -463,27 +497,9 @@ function flyToCountry(c) {
         
         setTimeout(() => {
             if (currentMapTab === 'risk') {
-                const color = riskColor(c.risk);
-                const popup = `
-                    <div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:160px">
-                        <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px"><img src="https://flagcdn.com/w20/${(c.iso2 || '').toLowerCase()}.png" width="18" alt="Flag" style="border-radius:2px; vertical-align:middle; margin-right:4px;"> ${c.name}</div>
-                        <div style="font-size:0.78rem;color:#64748b;margin-bottom:6px">${c.region || ''}</div>
-                        <div style="display:flex;gap:6px;flex-wrap:wrap">
-                            <span style="background:${color}20;color:${color};padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700">
-                                Risk: ${Math.round(c.risk)}
-                            </span>
-                            <span style="background:#f1f5f9;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:600;color:#475569">
-                                ${c.temp}°C · ${c.label}
-                            </span>
-                        </div>
-                        <div style="margin-top:8px">
-                            <a href="/country/${c.iso3}" style="font-size:0.75rem;font-weight:700;color:#7c3aed;text-decoration:none">
-                                View Full Profile </a>
-                        </div>
-                    </div>`;
                 L.popup({ autoClose: true })
                     .setLatLng([c.lat, c.lon])
-                    .setContent(popup)
+                    .setContent(buildCountryRiskPopup(c))
                     .openOn(mapToFly);
             } else if (currentMapTab === 'route') {
                 handleRouteClick(c);
@@ -615,32 +631,7 @@ function initRiskMap() {
         if (!c.lat || !c.lon) return;
         const color = riskColor(c.risk);
         const radius = 7;
-        const popup = `
-            <div style="font-family:'Plus Jakarta Sans',sans-serif; min-width:180px; padding: 4px 2px;">
-                <div style="display:flex; align-items:center; margin-bottom:10px;">
-                    <img src="https://flagcdn.com/w40/${c.iso2.toLowerCase()}.png" width="24" alt="Flag" style="border-radius:4px; margin-right:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"> 
-                    <div style="line-height:1.2;">
-                        <div style="font-weight:700; font-size:0.95rem; color:var(--text-dark);">${c.name}</div>
-                        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:500;">${c.region || ''}</div>
-                    </div>
-                </div>
-                
-                <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:${color}15; padding:6px 10px; border-radius:6px; border: 1px solid ${color}30;">
-                        <span style="font-size:0.75rem; font-weight:600; color:${color};"><i class="bi bi-shield-fill-exclamation me-1"></i> Risk Score</span>
-                        <span style="font-weight:800; font-size:0.85rem; color:${color};">${Math.round(c.risk)}</span>
-                    </div>
-                    
-                    <div style="display:flex; align-items:center; background:var(--bg); padding:6px 10px; border-radius:6px; border: 1px solid var(--border-color);">
-                        <span style="font-size:0.75rem; font-weight:600; color:var(--text-muted);"><i class="bi bi-thermometer-half me-1"></i> ${c.temp}°C</span>
-                        <span style="margin:0 6px; color:var(--border-color);">|</span>
-                        <span style="font-size:0.75rem; font-weight:600; color:var(--text-muted);">${c.label}</span>
-                    </div>
-                </div>
-                
-                <a href="/country/${c.iso3}" style="display:block; text-align:center; background:var(--primary-10); color:var(--primary); padding:8px; border-radius:6px; font-size:0.78rem; font-weight:700; text-decoration:none; transition:all 0.2s;">
-                    View Full Profile </a>
-            </div>`;
+        const popup = buildCountryRiskPopup(c);
         circleMarker(c.lat, c.lon, color, radius, popup, riskMap);
     });
 }

@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Article;
 use App\Models\NewsCache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class NewsService
 {
@@ -37,16 +39,16 @@ class NewsService
 
     public function fetchNews(string $query = 'logistics shipping trade economy', ?string $countryName = null, bool $forceRefresh = false): array
     {
-        $cacheKey = 'news_' . md5($query . '_' . $countryName);
+        $cacheKey = 'news_'.md5($query.'_'.$countryName);
 
-        if (!$forceRefresh) {
+        if (! $forceRefresh) {
             $cached = NewsCache::where('cache_key', $cacheKey)->first();
 
             if ($cached && $cached->cached_at->diffInMinutes(now()) < 120) {
                 $articles = is_string($cached->articles) ? json_decode($cached->articles, true) : $cached->articles;
-                
+
                 // pake cache cuma kl artikelnya beneran ada, jgn yg fake
-                if (!empty($articles) && !str_starts_with($articles[0]['url'] ?? '', '#')) {
+                if (! empty($articles) && ! str_starts_with($articles[0]['url'] ?? '', '#')) {
                     $sentiment = $this->analyzeSentiment($articles);
 
                     return [
@@ -80,25 +82,25 @@ class NewsService
         }
 
         // ambil berita buatan admin trus taruh paling atas ntar
-        $localArticles = \App\Models\Article::where('status', 'published')->latest()->get()->map(function($a) {
+        $localArticles = Article::where('status', 'published')->latest()->get()->map(function ($a) {
             return [
-                'title'       => $a->title,
-                'description' => $a->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($a->body), 150),
-                'url'         => $a->source_url ?? '#',
-                'source'      => 'Internal / Admin',
-                'published'   => $a->created_at->toISOString(),
-                'image'       => null, // ntar thumbnail bisa diurus dimari kl niat
+                'title' => $a->title,
+                'description' => $a->excerpt ?? Str::limit(strip_tags($a->body), 150),
+                'url' => $a->source_url ?? '#',
+                'source' => 'Internal / Admin',
+                'published' => $a->created_at->toISOString(),
+                'image' => null, // ntar thumbnail bisa diurus dimari kl niat
             ];
         })->toArray();
 
         // gabungin berita lokal dulu, baru deh berita api
-        if (!empty($localArticles)) {
+        if (! empty($localArticles)) {
             $articles = array_merge($localArticles, $articles);
             $articles = collect($articles)->unique('title')->values()->toArray();
         }
 
         // simpen ke cache kl sukses nyomot berita aslinya
-        if (!empty($articles)) {
+        if (! empty($articles)) {
             NewsCache::updateOrCreate(['cache_key' => $cacheKey], [
                 'articles' => $articles,
                 'cached_at' => now(),
@@ -109,7 +111,7 @@ class NewsService
             if ($cached) {
                 $articles = is_string($cached->articles) ? json_decode($cached->articles, true) : $cached->articles;
                 // buang aja berita karangan dr hasilnya
-                $articles = array_filter($articles, fn($a) => !str_starts_with($a['url'] ?? '', '#'));
+                $articles = array_filter($articles, fn ($a) => ! str_starts_with($a['url'] ?? '', '#'));
             }
         }
 
@@ -178,7 +180,7 @@ class NewsService
         foreach ($articles as &$article) {
             $text = strtolower(($article['title'] ?? '').' '.($article['description'] ?? ''));
             $words = preg_split('/\W+/', $text, -1, PREG_SPLIT_NO_EMPTY);
-            
+
             $artPos = 0;
             $artNeg = 0;
 
@@ -192,9 +194,9 @@ class NewsService
                     $artNeg++;
                 }
             }
-            
+
             $article['sentiment'] = $artPos > $artNeg ? 'Positive' : ($artPos < $artNeg ? 'Negative' : 'Neutral');
-            
+
             $total += count($words);
         }
 
@@ -262,7 +264,7 @@ class NewsService
             ],
             [
                 'title' => "New Tariff Regulations Implemented in {$country} Region",
-                'description' => "Authorities have announced a series of new tariff structures affecting cross-border logistics. Forwarders prepare for increased compliance checks.",
+                'description' => 'Authorities have announced a series of new tariff structures affecting cross-border logistics. Forwarders prepare for increased compliance checks.',
                 'url' => '#',
                 'source' => 'Economic Times',
                 'published' => now()->subHours(5)->toISOString(),
