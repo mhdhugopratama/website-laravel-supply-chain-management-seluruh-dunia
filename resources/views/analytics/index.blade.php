@@ -324,17 +324,17 @@ function loadAnalytics() {
                 type: 'doughnut',
                 data: {
                     labels: [
-                        '{{ __("app.risk.weather") }} (30%)',
-                        '{{ __("app.risk.inflation") }} (20%)',
-                        '{{ __("app.risk.news") }} (40%)',
-                        '{{ __("app.risk.currency") }} (10%)'
+                        '{{ __("app.risk.news") }} (30%)',
+                        '{{ __("app.risk.weather") }} (25%)',
+                        '{{ __("app.risk.inflation") }} (25%)',
+                        '{{ __("app.risk.currency") }} (20%)'
                     ],
                     datasets: [{
                         data: [
-                            (r.weather_risk * 0.30).toFixed(2),
-                            (r.inflation_risk * 0.20).toFixed(2),
-                            (r.news_risk * 0.40).toFixed(2),
-                            (r.currency_risk * 0.10).toFixed(2)
+                            (r.news_risk * 0.30).toFixed(2),
+                            (r.weather_risk * 0.25).toFixed(2),
+                            (r.inflation_risk * 0.25).toFixed(2),
+                            (r.currency_risk * 0.20).toFixed(2)
                         ],
                         backgroundColor: [
                             'rgba(0, 229, 255, 0.8)',
